@@ -1,5 +1,6 @@
 package jentus.vocabulary.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -16,7 +17,8 @@ public class Example {
     private String text;
 
 
-    @ManyToOne(targetEntity = Meaning.class,cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = Meaning.class)
     @JoinColumn(name = "refMeaning")
+    @JsonIgnore
     private Meaning meaning;
 }

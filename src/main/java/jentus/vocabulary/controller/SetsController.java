@@ -7,7 +7,9 @@ import jentus.vocabulary.service.ServiceSets;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+
 
 @RestController
 @AllArgsConstructor
@@ -20,6 +22,7 @@ public class SetsController {
         serviceSets.save(sets);
     }
     @GetMapping("/sets")
+    @ResponseBody
     public List<Sets> findAll() {
         return serviceSets.findAll();
     }

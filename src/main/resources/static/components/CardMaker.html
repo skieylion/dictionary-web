@@ -1,0 +1,82 @@
+<div ng-controller="CardMakerCtrl">
+    <div class="row">
+
+    </div>
+    <div class="row">
+        <div class="cell-md-5">
+            <div class="form-group">
+                <input type="text" data-role="input" ng-model="value" placeholder="введите слово или фразу">
+            </div>
+        </div>
+        <div class="cell-md-3">
+            <div class="form-group">
+                <input type="text" data-role="input" ng-model="transcription" placeholder="транскрипция">
+            </div>
+        </div>
+        <div class="cell-md-2">
+            <select data-role="select" id="formTypes"></select>
+        </div>
+        <div class="cell-md-2">
+            <input type="file" data-role="file" data-button-title="🎝" onchange="angular.element(this).scope().processAudio(this)">
+        </div>
+    </div>
+    <div data-role="accordion" data-one-frame="false" data-show-active="true">
+        <div class="frame active" ng-repeat="meaningDto in meaningDtoList">
+            <div class="heading">Значение</div>
+            <div class="content">
+                <div class="p-2">
+                    <div class="row">
+                        <div class="cell-md-6">
+                            <p>Определение</p>
+                            <textarea data-role="textarea" ng-model="meaningDto.def"  ></textarea>
+                        </div>
+                        <div class="cell-md-6">
+                            <p>Перевод</p>
+                            <textarea data-role="textarea" ng-model="meaningDto.translate" ></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="cell-md-2">
+                            <input type="file" data-role="file" data-button-title="📷" > <!-- @change="processPhotoValue($event,$index)" -->
+                        </div>
+                    </div>
+                    <div data-role="accordion" data-one-frame="false" data-show-active="true">
+                        <div class="frame active" ng-repeat="exampleDto in meaningDto.exampleDtoList">
+                            <div class="heading">Пример</div>
+                            <div class="content">
+                                <div class="p-2">
+                                    <div class="row">
+                                        <div class="cell-md-12">
+                                            <p>Пример</p>
+                                            <textarea data-role="textarea" ng-model="exampleDto.text"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="cell-md-2">
+                                            <input type="file" data-role="file" data-button-title="🎝" > <!-- @change="processAudioExample($event,$parent.$index,$index)" -->
+                                        </div>
+                                        <div class="cell-md-2">
+                                            <input type="file" data-role="file" data-button-title="🎥"> <!-- @change="processVideoExample($event,$parent.$index,$index)" -->
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <button class="button primary outline" ng-click="removeExample($index,$parent.$index)">Удалить пример</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <button class="button primary" ng-click="addNewExample($index)">Добавить пример</button>
+                        <button class="button primary outline" ng-click="removeValue($index)" disabled="{{isModeSingle}}">Удалить значение</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="cell-md-1">
+            <button class="button primary" ng-click="addNewValue()" disabled="{{isModeSingle}}">Добавить значение</button>
+        </div>
+    </div>
+</div>

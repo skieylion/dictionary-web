@@ -1,5 +1,6 @@
 package jentus.vocabulary.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -20,6 +21,9 @@ public class Form {
     @Column(name = "meta")
     private String meta;
 
+    @Column(name="transcription")
+    private String transcription;
+
     @ManyToOne(targetEntity = Lexeme.class,cascade = CascadeType.ALL)
     @JoinColumn(name = "lexemeId")
     private Lexeme lexeme;
@@ -29,7 +33,8 @@ public class Form {
     private TypeForm type;
 
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = Meaning.class,mappedBy = "form",fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @OneToMany(targetEntity = Meaning.class,mappedBy = "form",fetch = FetchType.LAZY,cascade = CascadeType.ALL,orphanRemoval = false)
+    @JsonIgnore
     private List<Meaning> meanings;
 
 }

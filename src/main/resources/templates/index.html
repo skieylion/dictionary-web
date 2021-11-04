@@ -1,264 +1,108 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" ng-app="myApp"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta charset="UTF-8"/>
+<!--        <meta name="metro4:init" content="false">-->
         <title>Spring Web</title>
-        <link rel="stylesheet" href="https://cdn.metroui.org.ua/v4.3.2/css/metro-all.min.css">
-        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <link th:href="@{metro4/css/metro-all.min.css}" rel="stylesheet" />
+        <script th:src="@{axios/dist/axios.min.js}"></script>
+        <script th:src="@{angular/angular.min.js}"></script>
+        <script th:src="@{commons.js}"></script>
+        <script th:src="@{rest.js}"></script>
+        <script th:src="@{main.js}"></script>
+        <script th:src="@{factories.js}"></script>
+        <script th:src="@{directives.js}"></script>
+        <script th:src="@{controllers/CardCtrl.js}"></script>
+        <script th:src="@{controllers/SetMakerDialogCtrl.js}"></script>
+        <script th:src="@{controllers/SetsSelectCtrl.js}"></script>
+        <script th:src="@{controllers/SetsCtrl.js}"></script>
+        <script th:src="@{controllers/CardMakerCtrl.js}"></script>
+        <script th:src="@{controllers/LearnDialogCtrl.js}"></script>
     </head>
     <body>
-        <div class="pos-absolute w-100 h-100" >
-            <div id="splitter_main" data-role="splitter" class="h-100 w-100" data-split-sizes="30, 70" data-save-state=true data-gutter-size="10">
-                <div class="d-flex flex-row-r w-100" >
-                    <ul  data-tabs-position="vertical h-100" data-role="tabs" class="no-border">
-                        <li>
-                            <a href="#target_1" style="justify-content:right;">
-                                карточки
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#target_2" style="justify-content:right;">
-                                наборы
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#target_3" style="justify-content:right;">
-                                изучение
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#target_4" style="justify-content:right;">
-                                выборки
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#target_5" style="justify-content:right;">
-                                словесные игры
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <div data-role="splitter" data-split-mode="vertical">
-                    <div class="d-flex flex-justify-center flex-align-center">
-                        <div class="bd-default no-border-top p-2 w-100 h-100" >
-                            <!-- cards -->
-                            <div id="target_1" class="w-100 h-100" >
-                                <div id="app_cards">
-                                    <div class="dialog w-75" data-role="dialog" id="cardDialog" >
-                                        <div class="dialog-title">Добавление новой карточки</div>
-                                        <div class="dialog-content">
-                                            <div class="container" style="overflow-y: auto; max-height:600px;">
-                                                <form id="form" action="javascript:" data-role="validator">
-                                                    <div class="row">
-                                                        <div class="cell-md-2">
-                                                            <select data-role="select" v-model="formType">
-                                                                <option v-for="form in forms" v-bind:value="form.id" >{{ form.name }}</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="cell-md-6">
-                                                            <div class="form-group">
-                                                                <input type="text" v-model="value" />
-                                                            </div>
-                                                        </div>
-                                                        <div class="cell-md-4">
-                                                            <input type="file" data-role="file" data-button-title="Выберите звук" @change="processAudio($event)">
-                                                        </div>
-                                                    </div>
-                                                    <div data-role="accordion" data-one-frame="false" data-show-active="true">
-                                                        <div class="frame active" v-for="(meaningDto,vIndex) in meaningDtoList">
-                                                            <div class="heading">Значение</div>
-                                                            <div class="content">
-                                                                <div class="p-2">
-                                                                    <div class="row">
-                                                                        <div class="cell-md-6">
-                                                                            <p>Определение</p>
-                                                                            <textarea data-role="textarea" v-model="meaningDto.def"  ></textarea>
-                                                                        </div>
-                                                                        <div class="cell-md-6">
-                                                                            <p>Перевод</p>
-                                                                            <textarea data-role="textarea" v-model="meaningDto.translate" ></textarea>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="row">
-                                                                        <div class="cell-md-2">
-                                                                            <input type="file" data-role="file" data-button-title="Выберите фото" @change="processPhotoValue($event,vIndex)">
-                                                                        </div>
-                                                                    </div>
+    <div data-role="panel">
+        <div class="row" ng-controller="SetsCtrl">
 
-                                                                    <div data-role="accordion" data-one-frame="false" data-show-active="true">
-                                                                        <div class="frame active" v-for="(exampleDto,eIndex) in meaningDto.exampleDtoList">
-                                                                            <div class="heading">Пример</div>
-                                                                            <div class="content">
-                                                                                <div class="p-2">
-                                                                                    <div class="row">
-                                                                                        <div class="cell-md-12">
-                                                                                            <p>Пример</p>
-                                                                                            <textarea data-role="textarea" v-model="exampleDto.text"></textarea>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="row">
-                                                                                        <div class="cell-md-2">
-                                                                                            <input type="file" data-role="file" @change="processAudioExample($event,vIndex,eIndex)" data-button-title="Выберите аудио">
-                                                                                        </div>
-                                                                                        <div class="cell-md-2">
-                                                                                            <input type="file" data-role="file" @change="processVideoExample($event,vIndex,eIndex)" data-button-title="Выберите видео">
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="row">
-                                                                                        <button class="button primary outline" v-on:click="removeExample(eIndex,vIndex)">Удалить пример</button>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
+            <div class="w-100">
+                <ng-include src="'components/SetSelect.html'"></ng-include>
+            </div>
 
-                                                                    <div class="row">
-                                                                        <button class="button primary" v-on:click="addNewExample(vIndex)">Добавить пример</button>
-                                                                        <button class="button primary outline" v-on:click="removeValue(vIndex)">Удалить значение</button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="cell-md-1">
-                                                            <button class="button primary" v-on:click="addNewValue">Добавить значение</button>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                        <div class="dialog-actions">
-                                            <button class="button js-dialog-close">Отменить</button>
-                                            <button class="button primary js-dialog-close" v-on:click="save">Сохранить</button>
-                                        </div>
-                                    </div>
-                                    <button class="button primary" onclick="Metro.dialog.open('#cardDialog')">Добавить карточку</button>
-                                </div>
+            <button class="button alert m-1 small" ng-click="findSets()">Найти</button>
+            <button class="button light m-1 small">
+                <input type="checkbox"  data-style="2" data-role="checkbox" ng-model="switcher" ng-change="changeSwitcher()"> {{switcherCaption}}
+            </button>
+            <button class="button primary outline m-1 small" ng-click="addDialogSets()">Добавить</button>
+            <button class="button primary outline m-1 small" ng-click="editDialogSets()" ng-disabled="isDisabledEdit">Редактировать</button>
+            <button class="button primary outline m-1 small" ng-click="removeDialogSets()" ng-disabled="isDisabledDelete">Удалить</button>
+            <button class="button primary outline m-1 small" ng-disabled="isDisabledUnit">Объединить</button>
+            <button class="button primary outline m-1 small" ng-click="learnDialog()" ng-disabled="isLearn">Изучать</button>
 
-
-                            </div>
-                            <!-- sets -->
-                            <div id="target_2" class="w-100 h-100" >
-                                <div id="app_sets" data-role="panel" class="w-100 h-100" data-width="100%" data-height="100%" >
-                                    <form id="sets" action="javascript:" data-role="validator">
-                                        <div class="form-group">
-                                            <label>название</label>
-                                            <input type="text" v-model="currentName" />
-                                        </div>
-                                        <div class="form-group">
-                                            <label>описание</label>
-                                            <textarea data-role="textarea"  v-model="currentDescription"></textarea>
-                                        </div>
-                                        <div class="form-group">
-                                            <button class="button primary" v-on:click="save">создать</button>
-                                        </div>
-                                    </form>
-                                    <table class="table compact">
-                                        <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th class="sortable-column sort-asc">Название</th>
-                                                <th>Дата создания</th>
-                                                <th>Действия</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr v-for="(set,rIndex) in sets">
-                                                <td>{{rIndex+1}}</td>
-                                                <td>{{set.name}}</td>
-                                                <td>{{set.date}}</td>
-                                                <td>
-                                                    <button v-for="act in set.actions" class="button link" v-on:click="actionClick(act.title,rIndex)">{{act.title}}</button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <!-- update a book -->
-                            <div id="target_3" class="w-100 h-100" >
-                                <form id="myForm3" action="javascript:" data-role="validator" onsubmit="update()">
-                                    <div class="form-group">
-                                        <label>book id</label>
-                                        <input type="text" name="id" data-validate="required minlength=1" />
-                                        <span class="invalid_feedback">
-                                            Input correct id with min length 1 symbols
-                                        </span>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>new name</label>
-                                        <input type="text" name="name" data-validate="required minlength=1" />
-                                        <span class="invalid_feedback">
-                                            Input correct name with min length 1 symbols
-                                        </span>
-                                    </div>
-                                    <div class="form-group">
-                                        <button class="button success">update</button>
-                                    </div>
-                                </form>
-                            </div>
-                            <!-- create a book -->
-                            <div id="target_4" class="w-100 h-100" >
-                                <form id="myForm4" action="javascript:" data-role="validator" onsubmit="create()">
-                                    <div class="form-group">
-                                        <label>book name</label>
-                                        <input type="text" name="name" data-validate="required minlength=1" />
-                                        <span class="invalid_feedback">
-                                            Input correct id with min length 1 symbols
-                                        </span>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>author</label>
-                                        <input type="text" name="author" data-validate="required minlength=1" />
-                                        <span class="invalid_feedback">
-                                            Input correct name with min length 1 symbols
-                                        </span>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>genre</label>
-                                        <input type="text" name="genre" data-validate="required minlength=1" />
-                                        <span class="invalid_feedback">
-                                            Input correct name with min length 1 symbols
-                                        </span>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>comment</label>
-                                        <input type="text" name="comment" data-validate="required minlength=1" />
-                                        <span class="invalid_feedback">
-                                            Input correct name with min length 1 symbols
-                                        </span>
-                                    </div>
-                                    <div class="form-group">
-                                        <button class="button success">create</button>
-                                    </div>
-                                </form>
-                            </div>
-                            <!-- delete a book -->
-                            <div id="target_5" class="w-100 h-100" >
-                                <form id="myForm5" action="javascript:" data-role="validator" onsubmit="deleteBook()">
-                                    <div class="form-group">
-                                        <label>book id</label>
-                                        <input type="text" name="id" data-validate="required minlength=1" />
-                                        <span class="invalid_feedback">
-                                            Input correct id with min length 1 symbols
-                                        </span>
-                                    </div>
-                                    <div class="form-group">
-                                        <button class="button success">delete</button>
-                                    </div>
-                                </form>
-                            </div>
+            <div ng-controller="SetsMakerDialogCtrl">
+                <confirm identifier="setsDialog" caption="Добавление набора" cancel="Отменить" ok="Сохранить">
+                    <div>
+                        <div class="form-group">
+                            <label>название</label>
+                            <input type="text" data-role="input" ng-model="current.name" />
+                        </div>
+                        <div class="form-group">
+                            <label>описание</label>
+                            <textarea data-role="textarea"  ng-model="current.description"></textarea>
                         </div>
                     </div>
-
-                </div>
+                </confirm>
             </div>
-        </div>
+            <ng-include src="'components/LearnDialog.html'"></ng-include>
 
-        <script src="app_cards.js"></script>
-        <script src="app_sets.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-        <script src="https://cdn.metroui.org.ua/v4.3.2/js/metro.min.js"></script>
+        </div>
+    </div>
+
+    <div ng-controller="CardCtrl" data-role="panel" >
+        <div style="overflow-y: auto; max-height:600px;">
+            <table id="cardTable" class="table compact table-border cell-border">
+                <thead>
+                    <tr>
+                        <th data-sortable="true">
+                            <input type="checkbox" data-role="checkbox" ng-model="checkedHeader" ng-change="changeCheckboxHeader()">
+                        </th>
+                        <th data-sortable="true">слово/фраза</th>
+                        <th data-sortable="true">значение</th>
+                        <th data-sortable="true">примеры</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="word in listWord">
+                        <td >
+                            <input type="checkbox" data-role="checkbox" ng-model="word.checkedRow">
+                        </td>
+                        <td >{{word.form.value}}</td>
+                        <td >{{word.def}}</td>
+                        <td>
+                            <ul>
+                                <li ng-repeat="example in word.examples">{{example.text}}</li>
+                            </ul>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <button class="button primary outline m-1 small" ng-click="addContext()">Добавить</button>
+        <button class="button primary outline m-1 small" ng-click="removeContext()">Удалить</button>
+
+        <confirm identifier="contextDialog" caption="Добавление контекста" cancel="Отменить" ok="Сохранить">
+                <ng-include src="'components/CardMaker.html'"></ng-include>
+        </confirm>
+
+
+    </div>
+
+
+
+
+
+
+
+    <script th:src="@{metro4/js/metro.min.js}"></script>
     </body>
 </html>
