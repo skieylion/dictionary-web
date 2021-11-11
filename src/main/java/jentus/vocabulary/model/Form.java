@@ -2,6 +2,7 @@ package jentus.vocabulary.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.ToString;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -33,8 +34,13 @@ public class Form {
     private TypeForm type;
 
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = Meaning.class,mappedBy = "form",fetch = FetchType.LAZY,cascade = CascadeType.ALL,orphanRemoval = false)
+    @OneToMany(targetEntity = Context.class,mappedBy = "form",fetch = FetchType.EAGER,cascade = CascadeType.ALL,orphanRemoval = false)
     @JsonIgnore
-    private List<Meaning> meanings;
+    @ToString.Exclude
+    private List<Context> contexts;
+
+    @ManyToOne(targetEntity = FileTable.class,cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @JoinColumn(name = "audioFile")
+    private FileTable audioFile;
 
 }

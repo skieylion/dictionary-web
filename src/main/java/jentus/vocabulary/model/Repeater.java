@@ -1,24 +1,32 @@
 package jentus.vocabulary.model;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
-@Table(name = "Example")
-@Data
-public class Example {
+@Table(name = "Repeater")
+public class Repeater {
+
+    @Getter
+    @Setter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "text")
-    private String text;
+    @Getter
+    @Setter
+    @Column(name = "ts")
+    private Date ts;
 
-
+    @Getter
+    @Setter
     @ManyToOne(targetEntity = Context.class)
-    @JoinColumn(name = "refMeaning")
+    @JoinColumn(name = "contextId")
     @JsonIgnore
     private Context context;
 }

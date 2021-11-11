@@ -10,16 +10,26 @@
         <script th:src="@{axios/dist/axios.min.js}"></script>
         <script th:src="@{angular/angular.min.js}"></script>
         <script th:src="@{commons.js}"></script>
+        <script th:src="@{model/Repeater.js}"></script>
+        <script th:src="@{model/State.js}"></script>
+        <script th:src="@{model/ContextFilter.js}"></script>
+        <script th:src="@{model/Context.js}"></script>
+        <script th:src="@{model/AudioVideoState.js}"></script>
+        <script th:src="@{model/ImageContextState.js}"></script>
+        <script th:src="@{model/TranslateState.js}"></script>
+        <script th:src="@{model/ReadingState.js}"></script>
+        <script th:src="@{model/EndState.js}"></script>
         <script th:src="@{rest.js}"></script>
         <script th:src="@{main.js}"></script>
         <script th:src="@{factories.js}"></script>
-        <script th:src="@{directives.js}"></script>
         <script th:src="@{controllers/CardCtrl.js}"></script>
         <script th:src="@{controllers/SetMakerDialogCtrl.js}"></script>
         <script th:src="@{controllers/SetsSelectCtrl.js}"></script>
         <script th:src="@{controllers/SetsCtrl.js}"></script>
         <script th:src="@{controllers/CardMakerCtrl.js}"></script>
         <script th:src="@{controllers/LearnDialogCtrl.js}"></script>
+        <script th:src="@{directives/ConfirmDrct.js}"></script>
+        <script th:src="@{directives/FileRead.js}"></script>
     </head>
     <body>
     <div data-role="panel">
@@ -57,7 +67,6 @@
 
         </div>
     </div>
-
     <div ng-controller="CardCtrl" data-role="panel" >
         <div style="overflow-y: auto; max-height:600px;">
             <table id="cardTable" class="table compact table-border cell-border">
@@ -69,6 +78,7 @@
                         <th data-sortable="true">слово/фраза</th>
                         <th data-sortable="true">значение</th>
                         <th data-sortable="true">примеры</th>
+                        <th data-sortable="true">статус</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -83,11 +93,13 @@
                                 <li ng-repeat="example in word.examples">{{example.text}}</li>
                             </ul>
                         </td>
+                        <td >{{word.status}}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
         <button class="button primary outline m-1 small" ng-click="addContext()">Добавить</button>
+        <button class="button primary outline m-1 small" ng-click="editContext()">Редактировать</button>
         <button class="button primary outline m-1 small" ng-click="removeContext()">Удалить</button>
 
         <confirm identifier="contextDialog" caption="Добавление контекста" cancel="Отменить" ok="Сохранить">

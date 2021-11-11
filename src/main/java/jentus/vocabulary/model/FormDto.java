@@ -3,18 +3,19 @@ package jentus.vocabulary.model;
 import lombok.Data;
 
 import java.util.List;
-import java.util.Set;
 
 @Data
 public class FormDto {
+    private long id;
     private String value;
     private String meta;
     private String transcription;
     private long lexemeId;
     private long typeId;
     private List<Long> listSetId;
-    private List<MeaningDto> meaningDtoList;
+    private List<ContextDto> contextDtoList;
     private List<Sets> sets;
+    private FileTable audioFile;
 
     @Override
     public String toString() {
@@ -23,7 +24,7 @@ public class FormDto {
                 ", meta='" + meta + '\'' +
                 ", lexemeId=" + lexemeId +
                 ", typeId=" + typeId +
-                ", meaningDtoList=" + meaningDtoList +
+                ", meaningDtoList=" + contextDtoList +
                 '}';
     }
 }

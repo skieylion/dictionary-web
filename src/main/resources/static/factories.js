@@ -1,6 +1,8 @@
 app.factory('cardMakerCtrlFactory',function(){
     return {
-        save:function(f){}
+        save:function(f){},
+        open:function(){},
+        edit:function(obj,f){}
     }
 });
 
@@ -58,3 +60,8 @@ app.factory('setsMakerDialogFactory',function(){
     }
 });
 
+app.factory('learnDialogFactory',function(){
+    return {
+        findBySets:function(f){}
+    }
+});

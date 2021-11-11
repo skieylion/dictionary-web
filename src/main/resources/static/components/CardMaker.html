@@ -17,31 +17,31 @@
             <select data-role="select" id="formTypes"></select>
         </div>
         <div class="cell-md-2">
-            <input type="file" data-role="file" data-button-title="🎝" onchange="angular.element(this).scope().processAudio(this)">
+            <input type="file" data-role="file" data-button-title="🎝" fileread="audioFile" > <!-- class="d-none" -->
         </div>
     </div>
     <div data-role="accordion" data-one-frame="false" data-show-active="true">
-        <div class="frame active" ng-repeat="meaningDto in meaningDtoList">
+        <div class="frame active" ng-repeat="contextDto in contextDtoList">
             <div class="heading">Значение</div>
             <div class="content">
                 <div class="p-2">
                     <div class="row">
                         <div class="cell-md-6">
                             <p>Определение</p>
-                            <textarea data-role="textarea" ng-model="meaningDto.def"  ></textarea>
+                            <textarea data-role="textarea" ng-model="contextDto.def"  ></textarea>
                         </div>
                         <div class="cell-md-6">
                             <p>Перевод</p>
-                            <textarea data-role="textarea" ng-model="meaningDto.translate" ></textarea>
+                            <textarea data-role="textarea" ng-model="contextDto.translate" ></textarea>
                         </div>
                     </div>
                     <div class="row">
                         <div class="cell-md-2">
-                            <input type="file" data-role="file" data-button-title="📷" > <!-- @change="processPhotoValue($event,$index)" -->
+                            <input type="file" data-role="file" data-button-title="📷" fileread="contextDto.photoFile">
                         </div>
                     </div>
                     <div data-role="accordion" data-one-frame="false" data-show-active="true">
-                        <div class="frame active" ng-repeat="exampleDto in meaningDto.exampleDtoList">
+                        <div class="frame active" ng-repeat="exampleDto in contextDto.exampleDtoList">
                             <div class="heading">Пример</div>
                             <div class="content">
                                 <div class="p-2">
@@ -53,10 +53,10 @@
                                     </div>
                                     <div class="row">
                                         <div class="cell-md-2">
-                                            <input type="file" data-role="file" data-button-title="🎝" > <!-- @change="processAudioExample($event,$parent.$index,$index)" -->
+                                            <input type="file" data-role="file" data-button-title="🎝" fileread="exampleDto.audioExampleFile">
                                         </div>
                                         <div class="cell-md-2">
-                                            <input type="file" data-role="file" data-button-title="🎥"> <!-- @change="processVideoExample($event,$parent.$index,$index)" -->
+                                            <input type="file" data-role="file" data-button-title="🎥" fileread="exampleDto.videoExampleFile" >
                                         </div>
                                     </div>
                                     <div class="row">

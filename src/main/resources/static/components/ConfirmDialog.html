@@ -6,10 +6,11 @@
         </div>
     </div>
     <div class="dialog-actions">
-        <button class="button js-dialog-close">{{confirm.cancel}}</button>
-        <button class="button primary js-dialog-close" ng-click="confirm.clickOk()">{{confirm.ok}}</button>
+        <button class="button js-dialog-close {{confirm.cancelVisible}}">{{confirm.cancel}}</button>
+        <button class="button primary js-dialog-close {{confirm.okVisible}}" ng-click="confirm.clickOk()">{{confirm.ok}}</button>
+        <button class="button {{confirm.prevVisible}}" ng-click="confirm.clickPrev()" >{{confirm.prev}}</button>
+        <button class="button {{confirm.nextVisible}}" ng-click="confirm.clickNext()" >{{confirm.next}}</button>
+        <button class="button {{confirm.serviceVisible}}" ng-click="confirm.clickService()" >{{confirm.service}}</button>
     </div>
 </div>
-
-
 

@@ -5,10 +5,12 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class MeaningDto {
+public class ContextDto {
+    private long id;
     private String def;
     private String translate;
     private List<ExampleDto> exampleDtoList;
+    private FileTable photoFile;
 
     @Override
     public String toString() {

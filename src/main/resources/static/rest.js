@@ -16,7 +16,7 @@ var Rest = {
         });
     },
     findBySets:function(flag,list,f){
-        axios.get("/meaning/set",{
+        axios.get("/context/set",{
              params: {
                 isUnionAll:flag,
                 ids: list
@@ -30,6 +30,11 @@ var Rest = {
             console.log("saved");
             exec(f);
         });
+    },
+    saveRepeater:function(contextId,f) {
+        axios.post("/repeater/context/"+contextId).then(() => {
+            console.log("saved");
+            exec(f);
+        });
     }
-
 }

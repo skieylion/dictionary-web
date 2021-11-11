@@ -1,4 +1,4 @@
-app.controller('CardMakerCtrl', function($scope,cardMakerCtrlFactory,setSelectCtrlFactory) {
+app.controller('CardMakerCtrl', function($scope,$timeout,cardMakerCtrlFactory,setSelectCtrlFactory) {
 
     $scope.setSelectCtrlFactory=setSelectCtrlFactory;
     $scope.value="";
@@ -26,48 +26,26 @@ app.controller('CardMakerCtrl', function($scope,cardMakerCtrlFactory,setSelectCt
         $scope.$apply();
     });
 
-    $scope.meaningDtoList=[{
-         photo:undefined,
-         exampleDtoList:[{
-             text:""
-         }]
-    }];
-    $scope.counter=0;
-    $scope.formType="1";
-    $scope.processAudio=function(event){
-        $scope.audio = event.target.files[0];
-        console.log($scope.audio);
-    };
 
-    $scope.processPhotoValue=function(event,vIndex){
-        $scope.meaningDtoList[vIndex].photo = event.target.files[0];
-        console.log($scope.meaningDtoList[vIndex].photo);
-    };
-    $scope.processVideoExample=function(event,vIndex,eIndex){
-        $scope.meaningDtoList[vIndex].exampleDtoList[eIndex].video = event.target.files[0];
-        console.log($scope.meaningDtoList[vIndex].exampleDtoList[eIndex].video);
-    };
-    $scope.processAudioExample=function(event,vIndex,eIndex){
-        $scope.meaningDtoList[vIndex].exampleDtoList[eIndex].audio = event.target.files[0];
-        console.log($scope.meaningDtoList[vIndex].exampleDtoList[eIndex].audio);
-    };
+
+
     $scope.addNewValue=function(){
-         $scope.meaningDtoList.push({
+         $scope.contextDtoList.push({
              exampleDtoList:[{
                  text:""
              }]
          });
     };
     $scope.addNewExample=function(vIndex){
-        $scope.meaningDtoList[vIndex].exampleDtoList.push({
+        $scope.contextDtoList[vIndex].exampleDtoList.push({
             text:""
         });
     };
     $scope.removeValue=function(vIndex){
-        $scope.meaningDtoList.splice(vIndex,1);
+        $scope.contextDtoList.splice(vIndex,1);
     };
     $scope.removeExample=function(eIndex,vIndex){
-        $scope.meaningDtoList[vIndex].exampleDtoList.splice(eIndex,1);
+        $scope.contextDtoList[vIndex].exampleDtoList.splice(eIndex,1);
     };
 
     $scope.cardMakerCtrlFactory=cardMakerCtrlFactory;
@@ -77,19 +55,56 @@ app.controller('CardMakerCtrl', function($scope,cardMakerCtrlFactory,setSelectCt
             $scope.value,
             t,
             $scope.transcription,
-            $scope.meaningDtoList
+            $scope.contextDtoList
         ])
         axios.post("/form",{
             value:$scope.value,
             typeId:t,
+            id:$scope.id?$scope.id:null,
+            audioFile:$scope.audioFile,
             transcription:$scope.transcription,
             meta:"{}",
             sets:$scope.setSelectCtrlFactory.getSelectedSetList(),
-            meaningDtoList:$scope.meaningDtoList
+            contextDtoList:$scope.contextDtoList
         }).then((response) => {
             console.log(response);
             if(f) f();
         });
+    }
+    $scope.cardMakerCtrlFactory.open=function(f){
+        $scope.value="";
+        $scope.audioFile=null;
+        $scope.audioFile="asdasd";
+        $scope.transcription="";
+        $scope.contextDtoList=[{
+             photo:undefined,
+             exampleDtoList:[{
+
+                 text:""
+             }]
+        }];
+        $scope.counter=0;
+        $scope.formType="1";
+        $scope.isModeSingle=true;
+        $timeout(function(){
+            $scope.$apply();
+            exec(f);
+        },150);
+    }
+    $scope.cardMakerCtrlFactory.edit=function(obj,f){
+        console.log("123123")
+        $scope.value=obj.value;
+        $scope.audioFile=obj.audioFile;
+        $scope.transcription=obj.transcription;
+        $scope.contextDtoList=obj.contextDtoList;
+        $scope.id=obj.id;
+        $scope.counter=0;
+        $scope.formType=obj.formType;
+        $scope.isModeSingle=true;
+        $timeout(function(){
+            $scope.$apply();
+            exec(f);
+        },150);
     }
 });
 

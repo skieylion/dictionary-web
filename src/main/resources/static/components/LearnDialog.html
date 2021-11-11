@@ -1,35 +1,9 @@
 <div ng-controller="LearnDialogCtrl">
-    <confirm identifier="learnDialog" caption="Ознакомьтесь со словом/фразой" cancel="Завершить" ok="Далее">
-        <div class="row">
-            <div class="cell flex-align-self-start">
-                <img width="640" height="480" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZwAAAE6CAIAAACtZnOdAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAPzSURBVHhe7dRBDQAwCACxCeGJf2d4mI9Lk2rou1mADKkBKVIDUqQGpEgNSJEakCI1IEVqQIrUgBSpASlSA1KkBqRIDUiRGpAiNSBFakCK1IAUqQEpUgNSpAakSA1IkRqQIjUgRWpAitSAFKkBKVIDUqQGpEgNSJEakCI1IEVqQIrUgBSpASlSA1KkBqRIDUiRGpAiNSBFakCK1IAUqQEpUgNSpAakSA1IkRqQIjUgRWpAitSAFKkBKVIDUqQGpEgNSJEakCI1IEVqQIrUgBSpASlSA1KkBqRIDUiRGpAiNSBFakCK1IAUqQEpUgNSpAakSA1IkRqQIjUgRWpAitSAFKkBKVIDUqQGpEgNSJEakCI1IEVqQIrUgBSpASlSA1KkBqRIDUiRGpAiNSBFakCK1IAUqQEpUgNSpAakSA1IkRqQIjUgRWpAitSAFKkBKVIDUqQGpEgNSJEakCI1IEVqQIrUgBSpASlSA1KkBqRIDUiRGpAiNSBFakCK1IAUqQEpUgNSpAakSA1IkRqQIjUgRWpAitSAFKkBKVIDUqQGpEgNSJEakCI1IEVqQIrUgBSpASlSA1KkBqRIDUiRGpAiNSBFakCK1IAUqQEpUgNSpAakSA1IkRqQIjUgRWpAitSAFKkBKVIDUqQGpEgNSJEakCI1IEVqQIrUgBSpASlSA1KkBqRIDUiRGpAiNSBFakCK1IAUqQEpUgNSpAakSA1IkRqQIjUgRWpAitSAFKkBKVIDUqQGpEgNSJEakCI1IEVqQIrUgBSpASlSA1KkBqRIDUiRGpAiNSBFakCK1IAUqQEpUgNSpAakSA1IkRqQIjUgRWpAitSAFKkBKVIDUqQGpEgNSJEakCI1IEVqQIrUgBSpASlSA1KkBqRIDUiRGpAiNSBFakCK1IAUqQEpUgNSpAakSA1IkRqQIjUgRWpAitSAFKkBKVIDUqQGpEgNSJEakCI1IEVqQIrUgBSpASlSA1KkBqRIDUiRGpAiNSBFakCK1IAUqQEpUgNSpAakSA1IkRqQIjUgRWpAitSAFKkBKVIDUqQGpEgNSJEakCI1IEVqQIrUgBSpASlSA1KkBqRIDUiRGpAiNSBFakCK1IAUqQEpUgNSpAakSA1IkRqQIjUgRWpAitSAFKkBKVIDUqQGpEgNSJEakCI1IEVqQIrUgBSpASlSA1KkBqRIDUiRGpAiNSBFakCK1IAUqQEpUgNSpAakSA1IkRqQIjUgRWpAitSAFKkBKVIDUqQGpEgNSJEakCI1IEVqQIrUgBSpASlSA1KkBqRIDUiRGpAiNSBFakCK1IAUqQEpUgNSpAakSA1IkRqQIjUgRWpAitSAFKkBIbMfroVPR1s3+VwAAAAASUVORK5CYII=">
-                <a target="_blank" href="https://www.google.com/search?&tbm=isch&q=mood">search in Google</a>
-            </div>
-            <div class="cell flex-align-self-end">
-                <div class="d-flex flex-justify-start h1">mood</div>
-                <div class="d-flex flex-justify-start">
-                    <ul>
-                        <li>
-                            <a target="_blank" href="https://youglish.com/pronounce/mood/english/uk">see the context in YouGlish</a>
-                        </li>
-                        <li>
-                            <a target="_blank" href="https://dictionary.cambridge.org/dictionary/english/mood">see the context in Cambridge Dictionary</a>
-                        </li>
-                    </ul>
-
-                </div>
-
-                <div class="d-flex flex-justify-start">the way you feel at a particular time</div>
-                <div class="d-flex flex-justify-start">
-                    <ul>
-                        Examples:
-                        <li>The drink had put him in an amiable mood.</li>
-                        <li>She's in a good/bad mood.</li>
-                        <a target="_blank" href="https://context.reverso.net/translation/english-russian/mood">see examples in Reverso Context</a>
-                    </ul>
-                </div>
+    <confirm identifier="learnDialog" caption="Ознакомьтесь со словом" ok="Завершить" next="Далее" prev="Назад">
+        <div class="row {{card.isVisible?'visible':'d-none'}}" ng-repeat="card in listCard">
+            <div style="height:550px;">
+                <ng-include src="card.templateName"></ng-include>
             </div>
         </div>
-
     </confirm>
 </div>
