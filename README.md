@@ -1,7 +1,5 @@
 # Dictionary
 
-## The Author is ubahhukob
-
 ## Tasks
 
 | Name | Description | State |
