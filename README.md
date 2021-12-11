@@ -1,15 +1,15 @@
 # Dictionary
 
-## An Author is ubahhukob
+## The Author is ubahhukob
 
 ## Tasks
 
-| Name | Description |
-| ------ | ------ | 
-| TASK-? | homework_1 |
-| TASK-? | homework_2 |
-| TASK-? | homework_4 |
-| TASK-? | homework_5 |
-| TASK-? | homework_7 |
-| TASK-? | homework_9_6 |
+| Name | Description | State |
+| ------ | ------ | ------ |
+| TASK-STACK | change stack and added docker for communications react app and spring app | IN WORK |
+| TASK-? | description | IN PLAN |
+| TASK-? | description | IN PLAN |
+| TASK-? | description | IN PLAN |
+| TASK-? | description | IN PLAN |
+| TASK-? | description | IN PLAN |
 
