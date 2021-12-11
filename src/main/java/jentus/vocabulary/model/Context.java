@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -35,7 +34,7 @@ public class Context {
 
     @Getter
     @Setter
-    @ManyToOne(targetEntity = Form.class,fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity = Form.class,fetch = FetchType.EAGER)
     @JoinColumn(name = "refForm")
     @JsonIgnoreProperties(value = {"hibernateLazyInitializer"}) //"applications",
     private Form form;
@@ -66,6 +65,6 @@ public class Context {
     @Getter
     @Setter
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = Repeater.class, mappedBy = "context", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
-    private List<Repeater> repeater;
+    @OneToMany(targetEntity = ContextEvent.class, mappedBy = "context", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    private List<ContextEvent> contextEvent;
 }

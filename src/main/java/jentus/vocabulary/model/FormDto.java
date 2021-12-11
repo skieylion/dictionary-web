@@ -6,7 +6,7 @@ import java.util.List;
 
 @Data
 public class FormDto {
-    private long id;
+    private Long id;
     private String value;
     private String meta;
     private String transcription;

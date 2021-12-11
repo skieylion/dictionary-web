@@ -13,7 +13,6 @@ app.directive("fileread", [function () {
 
                     reader.onload = function (loadEvent) {
                         scope.$apply(function () {
-                            console.log("data",loadEvent.target.result)
                             scope.fileread = {
                                 name:file.name,
                                 format:format,

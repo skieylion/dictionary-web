@@ -8,6 +8,7 @@ class ImageContextState extends State {
         var listCard=[];
         for(var i=0;i<list.length;i++){
             var word=list[i];
+            console.log("word",word);
             listCard.push({
                 listObj:word,
                 isVisible:i==0?true:false,
@@ -15,7 +16,7 @@ class ImageContextState extends State {
                 context:word.form.value,
                 isResult:null,
                 definition:word.def,
-                srcImage:word.photoFile.data,
+                srcImage:word.photoFile?word.photoFile.dataStr:null,
                 contextBuffer:"",
                 checkImageContext:function(){
                     var word1=this.contextBuffer;
@@ -36,7 +37,7 @@ class ImageContextState extends State {
     }
     clickService(){
         this.clickServiceDefault(function(context){
-            return new AudioVideoState(context);
+            return new EndState(context);
         },function(context){
             return new ImageContextState(context);
         });

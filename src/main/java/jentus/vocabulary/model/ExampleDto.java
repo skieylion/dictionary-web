@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class ExampleDto {
-    private long id;
+    private Long id;
     private String text;
     private String audioExampleFile;
     private String videoExampleFile;

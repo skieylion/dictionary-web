@@ -31,10 +31,8 @@ public class ServiceFormImpl implements ServiceForm {
         }
 
         Form form = new Form();
-        long id=formDto.getId();
-        if(id>0) form.setId(id);
-
-        System.out.println(id);
+        Long id=formDto.getId();
+        if(id!=null) form.setId(id);
 
         form.setAudioFile(fileTable);
         form.setValue(formDto.getValue());
@@ -59,7 +57,8 @@ public class ServiceFormImpl implements ServiceForm {
         formDto.getContextDtoList().forEach(meaningDto -> {
             Context context = new Context();
             context.setForm(form);
-            if(meaningDto.getId()>0) context.setId(meaningDto.getId());
+
+            if(meaningDto.getId()!=null) context.setId(meaningDto.getId());
             context.setPhotoFile(meaningDto.getPhotoFile());
             if(context.getPhotoFile()!=null&&(context.getPhotoFile().getUid()==null || context.getPhotoFile().getUid().equals(""))){
                 context.getPhotoFile().setUid(getUUID());
@@ -72,7 +71,7 @@ public class ServiceFormImpl implements ServiceForm {
             meaningDto.getExampleDtoList().forEach(exampleDto -> {
                 Example example = new Example();
                 example.setText(exampleDto.getText());
-                if(exampleDto.getId()>0) example.setId(exampleDto.getId());
+                if(exampleDto.getId()!=null) example.setId(exampleDto.getId());
                 example.setContext(context);
                 exampleList.add(example);
             });

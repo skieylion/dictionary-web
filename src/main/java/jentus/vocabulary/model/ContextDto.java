@@ -6,7 +6,7 @@ import java.util.List;
 
 @Data
 public class ContextDto {
-    private long id;
+    private Long id;
     private String def;
     private String translate;
     private List<ExampleDto> exampleDtoList;

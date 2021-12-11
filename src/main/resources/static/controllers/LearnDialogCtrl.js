@@ -7,17 +7,18 @@ app.controller('LearnDialogCtrl', function($scope,$timeout,setCtrlFactory,setSel
     $scope.listCard=[];
     $scope.context=null;
 
-    var findBySets=function(f){
-        var flag=$scope.setCtrlFactory.isUnionAll;
+    var findBySet=function(f){
+        console.log("123")
         var selected=$scope.setSelectCtrlFactory.getSelectedIdList();
-        Rest.findBySets(flag,selected,function(response){
+        Rest.findForStudying(selected[0],function(response){
             console.log("get cards",response);
             exec(f,response.data);
         });
     }
 
     $scope.setCtrlFactory.subscribeToLearnDialog(function(){
-        findBySets(function(list){
+        console.log("listen")
+        findBySet(function(list){
             var filter=new ContextFilter(list);
             var filterList=filter.getFilteredList();
             var context=new Context($scope,filterList);

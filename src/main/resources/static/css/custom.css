@@ -1,0 +1,6 @@
+.DataTableSelected {
+    background-color:blue !important;
+}
+.DataTableSelected.sorting_1 {
+    background-color:blue !important;
+}

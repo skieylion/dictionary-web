@@ -3,7 +3,12 @@ class Repeater {
         var size=rep?rep.length:0;
         var arr=[];
         for(var j=0;j<size;j++){
-            arr.push(Date.parse(rep[j].ts));
+            if(rep[j].contextStatus&&rep[j].contextStatus.id==1) {
+                arr.push(Date.parse(rep[j].ts));
+            } else if(rep[j].contextStatus&&rep[j].contextStatus.id==2){
+                this.state="studied";
+                return;
+            }
         }
         arr.sort(function(a, b){return a - b});
         var last=arr.pop();
@@ -11,6 +16,9 @@ class Repeater {
         var offset=size>0?(current.getTime()-last)/1000/60:0;
         this.state="repeat";
         this.count=size;
+//        if(rep) {
+//            console.log("rep",offset,size,rep)
+//        }
 
         switch (size) {
             case 0:

@@ -1,0 +1,15 @@
+<div class="dialog w-75" data-role="dialog" id="cardDialog" >
+    <div class="dialog-title">Выбор набора</div>
+    <div class="dialog-content">
+        <div class="container" style="overflow-y: auto; max-height:600px;">
+            <div ng-controller="CardMakerCtrl">
+                <ng-include src="'components/CardMaker.html'"></ng-include>
+            </div>
+        </div>
+    </div>
+    <div class="dialog-actions">
+        <button class="button js-dialog-close">Отменить</button>
+        <button class="button primary js-dialog-close" ng-click="save">Сохранить</button>
+    </div>
+</div>
+<button class="button primary" onclick="Metro.dialog.open('#cardDialog')">Добавить карточку</button>

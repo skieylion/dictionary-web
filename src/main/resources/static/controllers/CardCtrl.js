@@ -1,5 +1,6 @@
-app.controller('CardCtrl', function($scope,$timeout,cardCtrlFactory,cardMakerCtrlFactory,setSelectCtrlFactory,setCtrlFactory) {
+app.controller('CardCtrl', function($scope,$timeout,cardCtrlFactory,cardMakerCtrlFactory,setSelectCtrlFactory,setCtrlFactory,setWindowFactory) {
 
+    $scope.setWindowFactory=setWindowFactory;
     $scope.setCtrlFactory=setCtrlFactory;
     $scope.setSelectCtrlFactory=setSelectCtrlFactory;
     $scope.cardMakerCtrlFactory=cardMakerCtrlFactory;
@@ -9,52 +10,154 @@ app.controller('CardCtrl', function($scope,$timeout,cardCtrlFactory,cardMakerCtr
     $scope.listWord=[ ];
     var oldFlag=false;
 
-    $scope.cardCtrlFactory.findBySets=function(f){
-        var flag=$scope.setCtrlFactory.isUnionAll;
-        var selected=$scope.setSelectCtrlFactory.getSelectedIdList();
-        Rest.findBySets(flag,selected,function(response){
-            console.log("get words",response);
-            $scope.listWord=response.data;
-            for(var i=0;i<$scope.listWord.length;i++){
-                var word=$scope.listWord[i];
-                word.status="-";
-                var rep=new Repeater(word.repeater);
-                var info=rep.getInfo();
-                switch(info.state){
-                    case "new":
-                        word.status="-";
-                        break;
-                    case "repeated":
-                        word.status="через "+String(info.offset)+info.unit;
-                        break;
-                    case "repeat":
-                        word.status="повторить!!!";
-                        break;
-                    case "studied":
-                        word.status="выучено";
-                        break;
+    angular.element(document).ready(function () {
+        $scope.table=$('#cardTable').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ordering": false,
+            "scrollY":  "700px",
+            "ajax": {
+                "url":"/context/table",
+                "data": function (data) {
+                    data.isUnionAll = $scope.setCtrlFactory.isUnionAll;
+                    data.ids=$scope.setSelectCtrlFactory.getSelectedIdList();
+                }
+            },
+            "drawCallback" : function() {
+                var ids=[ ];
+                $("#cardTable tr").each(function(){
+                    var id=$(this).attr("id");
+                    $(this).find("td:eq(0) input[type='checkbox']").on( 'click', function (e) {
+                        var val=$(this).prop("checked")
+                        for(var i=0;i<$scope.listWord.length;i++){
+                            if($scope.listWord[i].id==id){
+                                $scope.listWord[i].checkedRow=val;
+                            }
+                        }
+                    });
+
+                    if(id){
+                        ids.push(id);
+                    }
+                });
+                $scope.listWord=[];
+                Rest.getContextByListId(ids,function(data){
+                    $scope.listWord=data;
+                    console.log($scope.listWord);
+                });
+            },
+            "columns": [
+                { "data": "checkbox" },
+                { "data": "word" },
+                { "data": "typeOf" },
+                { "data": "status" },
+                { "data": "def" },
+                { "data": "examples" }
+            ]
+        });
+        $("#divTable  th:eq(0) input[type='checkbox']").on( 'click', function (e) {
+
+            var val=$(this).prop('checked');
+            $("#cardTable tr").each(function(){
+                $(this).find("td:eq(0) input[type='checkbox']").prop("checked",val);
+            });
+            if($scope.listWord){
+                for(var i=0;i<$scope.listWord.length;i++){
+                    $scope.listWord[i].checkedRow=val;
                 }
             }
+        } );
+    });
 
-            $scope.$apply();
-            if(f) f();
-
-        });
+    $scope.cardCtrlFactory.findBySets=function(f){
+        $scope.table.ajax.reload(null,false);
+        exec(f);
     }
 
     $scope.getAllBySets=function(){
         $scope.cardCtrlFactory.findBySets();
     }
 
-
-    //$scope.getAllBySets();
-
     $scope.addContext=function(){
         $scope.cardMakerCtrlFactory.open(function(){
             $scope.confirm.open();
         });
+    }
+
+    var getCheckedList=function(){
+        var arr=[];
+        for(var i=0;i<$scope.listWord.length;i++){
+            var word=$scope.listWord[i];
+            if(word.checkedRow) {
+                arr.push(word);
+            }
+        }
+        return arr;
+    }
+
+
+    $scope.attachToSet=function(){
+        console.log("attach")
+        $scope.setWindowFactory.open(function(setList) {
+            console.log("setList",setList);
+            var contextList=getCheckedList();
+
+            var recursive=function(contextIndexId,setIndexId,f){
+                var contextId=contextList[contextIndexId].id;
+                var setId=setList[setIndexId];
+                Rest.attachToSet(contextId,setId,function(){
+                    if(contextIndexId+1<contextList.length) {
+                        recursive(contextIndexId+1,setIndexId,f);
+                    } else if (setIndexId+1<setList.length) {
+                        recursive(0,setIndexId+1,f);
+                    } else {
+                        exec(f);
+                    }
+
+                });
+            }
+
+            if(setList&&setList.length>0&&contextList&&contextList.length>0) {
+                recursive(0,0,$scope.getAllBySets)
+            }
+        });
 
     }
+
+    $scope.detach=function(){
+        var wordList=$scope.setSelectCtrlFactory.getSelectedSetList();
+        var list=getCheckedList();
+
+        for(var i=0;i<wordList.length;i++){
+            var setId=wordList[i].id;
+            for(var j=0;j<list.length;j++){
+                var contextId=list[j].id;
+                Rest.detachFromSet(contextId,setId);
+            }
+        }
+        $timeout($scope.getAllBySets,5000);
+    }
+
+    $scope.knowContext=function(){
+        var list=getCheckedList();
+        for(var i=0;i<list.length;i++){
+            Rest.studiedContext(list[i].id,function(){
+                console.log("know context")
+            });
+        }
+        $timeout($scope.getAllBySets,5000);
+    }
+
+    $scope.unknownContext=function(){
+        var list=getCheckedList();
+        for(var i=0;i<list.length;i++){
+            Rest.unknownContext(list[i].id,function(){
+                console.log("know context")
+            });
+        }
+        $timeout($scope.getAllBySets,5000);
+    }
+
     $scope.editContext=function(){
         for(var i=0;i<$scope.listWord.length;i++){
             var word=$scope.listWord[i];
@@ -83,21 +186,23 @@ app.controller('CardCtrl', function($scope,$timeout,cardCtrlFactory,cardMakerCtr
 
     }
 
+
+
     $scope.removeContext=function(){
-        var rec=function(index){
-            if(index<$scope.listWord.length) {
-                if($scope.listWord[index].checkedRow) {
-                    axios.delete("/context/"+$scope.listWord[index].id).then((response) => {
-                        rec(++index);
-                    });
-                } else {
-                    rec(++index);
-                }
-            } else {
-                $scope.getAllBySets();
-            }
-        };
-        rec(0);
+//        var rec=function(index){
+//            if(index<$scope.listWord.length) {
+//                if($scope.listWord[index].checkedRow) {
+//                    axios.delete("/context/"+$scope.listWord[index].id).then((response) => {
+//                        rec(++index);
+//                    });
+//                } else {
+//                    rec(++index);
+//                }
+//            } else {
+//                $scope.getAllBySets();
+//            }
+//        };
+//        rec(0);
     }
 
     $scope.changeCheckboxHeader=function(){

@@ -1,17 +1,7 @@
 package jentus.vocabulary.service;
 
-import jentus.vocabulary.model.Context;
-import jentus.vocabulary.model.Repeater;
-import jentus.vocabulary.repository.ContextRepository;
-import jentus.vocabulary.repository.FileTableRepository;
-import jentus.vocabulary.repository.FormRepository;
-import jentus.vocabulary.repository.RepeaterRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 @Service
 @AllArgsConstructor

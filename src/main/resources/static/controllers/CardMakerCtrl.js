@@ -73,8 +73,8 @@ app.controller('CardMakerCtrl', function($scope,$timeout,cardMakerCtrlFactory,se
     }
     $scope.cardMakerCtrlFactory.open=function(f){
         $scope.value="";
+        $scope.id=null;
         $scope.audioFile=null;
-        $scope.audioFile="asdasd";
         $scope.transcription="";
         $scope.contextDtoList=[{
              photo:undefined,

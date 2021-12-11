@@ -65,3 +65,9 @@ app.factory('learnDialogFactory',function(){
         findBySets:function(f){}
     }
 });
+
+app.factory('setWindowFactory',function(){
+    return {
+        open:function(close){}
+    }
+});

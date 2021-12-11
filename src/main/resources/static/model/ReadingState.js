@@ -7,6 +7,7 @@ class ReadingState extends State {
         this.youGlish="https://youglish.com/pronounce/{{context}}/english/uk";
         this.cambridge="https://dictionary.cambridge.org/dictionary/english/{{context}}";
         this.reverso="https://context.reverso.net/translation/english-russian/{{context}}";
+        this.translate="https://translate.google.com/?sl=en&tl=ru&text={{context}}&op=translate";
 
         var list=context.getList();
         var listCard=[];
@@ -32,6 +33,7 @@ class ReadingState extends State {
                 linkCambridge:this.cambridge.replace("{{context}}",ctx),
                 definition:word.def,
                 linkReversoContext:this.reverso.replace("{{context}}",ctx),
+                linkTranslate:encodeURI(this.translate.replace("{{context}}",ctx)),
                 isVisible:i==0?true:false,
                 examples:[]
             });
@@ -98,10 +100,8 @@ class ReadingState extends State {
     clickService(){
         if(this.preState){
             this.context.setState(this.preState(this.context));
-
         } else {
-            //this.context.setState(new TranslateState(this.context));
-            this.context.setState(new AudioVideoState(this.context));
+            this.context.setState(new TranslateState(this.context));
         }
     }
 }

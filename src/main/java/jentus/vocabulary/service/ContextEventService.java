@@ -1,5 +1,5 @@
 package jentus.vocabulary.service;
 
-public interface RepeaterService {
+public interface ContextEventService {
     void save(long contextId);
 }

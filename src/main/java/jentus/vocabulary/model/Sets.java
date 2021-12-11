@@ -17,4 +17,9 @@ public class Sets {
 
     @Column(name = "description")
     private String description;
+
+    @Override
+    public int hashCode(){
+        return (int)id;
+    }
 }

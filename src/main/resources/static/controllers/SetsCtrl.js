@@ -19,6 +19,7 @@ app.controller('SetsCtrl',function($scope,$timeout,setSelectCtrlFactory,cardCtrl
         else $scope.switcherCaption="∩";
     }
     $scope.learnDialog=function(){
+        console.log("produce")
         $scope.setCtrlFactory.produceLearnDialog();
     }
 
