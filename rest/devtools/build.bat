@@ -1,0 +1,1 @@
+docker build --tag myapp:1-SNAPSHOT .

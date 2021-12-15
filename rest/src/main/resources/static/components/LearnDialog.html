@@ -1,9 +1,0 @@
-<div ng-controller="LearnDialogCtrl">
-    <confirm identifier="learnDialog" caption="Ознакомьтесь со словом" ok="Завершить" next="Далее" prev="Назад">
-        <div class="row {{card.isVisible?'visible':'d-none'}}" ng-repeat="card in listCard">
-            <div style="height:550px;">
-                <ng-include src="card.templateName"></ng-include>
-            </div>
-        </div>
-    </confirm>
-</div>

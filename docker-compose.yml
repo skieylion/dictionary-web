@@ -1,0 +1,45 @@
+version: '3'
+
+
+services:
+  battle_ship_bot:
+    depends_on:
+      - battle_ship_engine
+    build:
+      context: ./BattleShipBot
+      dockerfile: Dockerfile
+    ports:
+      - 8083:8083
+    networks:
+      - skynet
+  battle_ship_engine:
+    build:
+      context: ./BattleShipEngine
+      dockerfile: Dockerfile
+    ports:
+      - 8082:8082
+    networks:
+      - skynet
+  rabbitmq:
+    image: rabbitmq:management
+    hostname: rabbitmq
+    networks:
+      - skynet
+    ports:
+      - 5672:5672
+      - 15672:15672
+  redis:
+    image: redis
+    restart: always
+    command: [ "redis-server", "--appendonly", "yes" ]
+    hostname: redis
+    networks:
+      - skynet
+    volumes:
+      - redis-data:/data
+    ports:
+      - 6379:6379
+networks:
+  skynet:
+volumes:
+  redis-data:
