@@ -34,3 +34,6 @@ build/
 
 #node
 /node_modules/
+
+#pgdata
+/pgdata/

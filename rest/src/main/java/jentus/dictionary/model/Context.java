@@ -3,7 +3,6 @@ package jentus.dictionary.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -47,7 +46,7 @@ public class Context {
             joinColumns = {@JoinColumn(name = "contextId")},
             inverseJoinColumns = {@JoinColumn(name = "setId")}
     )
-    private Set<Sets> sets = new HashSet<>();
+    private Set<ContextList> sets = new HashSet<>();
 
     @Getter
     @Setter

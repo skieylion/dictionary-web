@@ -20,8 +20,8 @@ public class ContextStatus {
     public ContextStatus() {
     }
 
-    public ContextStatus(ContextStatusType contextStatusType) {
-        this.id = contextStatusType.getStatusId();
-    }
+//    public ContextStatus(ContextStatusType contextStatusType) {
+//        this.id = contextStatusType.getStatusId();
+//    }
 
 }

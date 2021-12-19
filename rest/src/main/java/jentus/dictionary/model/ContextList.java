@@ -7,7 +7,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "Sets")
 @Data
-public class Sets {
+public class ContextList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;

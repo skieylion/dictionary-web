@@ -1,45 +1,32 @@
 version: '3'
 
-
 services:
-  battle_ship_bot:
-    depends_on:
-      - battle_ship_engine
-    build:
-      context: ./BattleShipBot
-      dockerfile: Dockerfile
-    ports:
-      - 8083:8083
-    networks:
-      - skynet
-  battle_ship_engine:
-    build:
-      context: ./BattleShipEngine
-      dockerfile: Dockerfile
-    ports:
-      - 8082:8082
-    networks:
-      - skynet
-  rabbitmq:
-    image: rabbitmq:management
-    hostname: rabbitmq
-    networks:
-      - skynet
-    ports:
-      - 5672:5672
-      - 15672:15672
-  redis:
-    image: redis
+  db:
+    container_name: postgresql_db
+    image: postgres
     restart: always
-    command: [ "redis-server", "--appendonly", "yes" ]
-    hostname: redis
-    networks:
-      - skynet
-    volumes:
-      - redis-data:/data
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+      #POSTGRES_DB: test_db
     ports:
-      - 6379:6379
-networks:
-  skynet:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+  pgadmin:
+    container_name: pgadmin4
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: root@root.com
+      PGADMIN_DEFAULT_USER: root
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
 volumes:
-  redis-data:
+  db-data:
+  pgadmin-data:
+  

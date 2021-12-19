@@ -3,17 +3,13 @@ package jentus.dictionary.service;
 import jentus.dictionary.exception.ContextNotFoundException;
 import jentus.dictionary.exception.ContextStatusNotFoundException;
 import jentus.dictionary.model.Context;
-import jentus.dictionary.model.ContextEvent;
-import jentus.dictionary.model.ContextStatus;
-import jentus.dictionary.model.ContextStatusType;
 import jentus.dictionary.repository.ContextEventRepository;
 import jentus.dictionary.repository.ContextRepository;
 import jentus.dictionary.repository.ContextStatusRepository;
-import jentus.dictionary.repository.SetsRepository;
+import jentus.dictionary.repository.ContextListRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -21,16 +17,14 @@ public class ServiceContextImpl implements ServiceContext {
 
     private final ContextRepository contextRepository;
     private final ContextEventRepository contextEventRepository;
-    private final ContextStatus contextStatusRepeat;
-    private final ContextStatus contextStatusStudied;
-    private final SetsRepository setsRepository;
 
-    public ServiceContextImpl(ContextRepository contextRepository, ContextEventRepository contextEventRepository, ContextStatusRepository contextStatusRepository, SetsRepository setsRepository) throws ContextStatusNotFoundException {
+    private final ContextListRepository contextListRepository;
+
+    public ServiceContextImpl(ContextRepository contextRepository, ContextEventRepository contextEventRepository, ContextStatusRepository contextStatusRepository, ContextListRepository contextListRepository) throws ContextStatusNotFoundException {
         this.contextRepository = contextRepository;
         this.contextEventRepository = contextEventRepository;
-        this.setsRepository = setsRepository;
-        this.contextStatusRepeat = contextStatusRepository.findById(ContextStatusType.REPEATED.getStatusId()).orElseThrow(ContextStatusNotFoundException::new);
-        this.contextStatusStudied = contextStatusRepository.findById(ContextStatusType.STUDIED.getStatusId()).orElseThrow(ContextStatusNotFoundException::new);
+        this.contextListRepository = contextListRepository;
+
     }
 
     @Override
@@ -59,40 +53,11 @@ public class ServiceContextImpl implements ServiceContext {
         return contextRepository.findByParams(isUnionAll, ids, isStudiedToo);
     }
 
-    @Override
-    public void know(long contextId) {
-        contextRepository.findById(contextId).ifPresent(context -> {
-            ContextEvent contextEvent = new ContextEvent();
-            contextEvent.setContext(context);
-            contextEvent.setTs(new Date());
-            contextEvent.setContextStatus(contextStatusStudied);
-            contextEventRepository.save(contextEvent);
-        });
-    }
-
-    @Override
-    @Transactional
-    public void notKnow(long contextId) {
-        contextRepository.findById(contextId).ifPresent(context -> {
-            contextEventRepository.deleteAllEventsByContextId(contextId);
-        });
-    }
-
-    @Override
-    public void repeat(long contextId) {
-        contextRepository.findById(contextId).ifPresent(context -> {
-            ContextEvent contextEvent = new ContextEvent();
-            contextEvent.setContext(context);
-            contextEvent.setTs(new Date());
-            contextEvent.setContextStatus(contextStatusRepeat);
-            contextEventRepository.save(contextEvent);
-        });
-    }
 
     @Override
     public void attachToSet(long contextId, long setId) {
         contextRepository.findById(contextId).ifPresent(context -> {
-            setsRepository.findById(setId).ifPresent(sets -> {
+            contextListRepository.findById(setId).ifPresent(sets -> {
                 if (!context.getSets().contains(sets)) {
                     context.getSets().add(sets);
                     contextRepository.save(context);
@@ -105,7 +70,7 @@ public class ServiceContextImpl implements ServiceContext {
     @Transactional
     public void detachFromSet(long contextId, long setId) {
         contextRepository.findById(contextId).ifPresent(context -> {
-            setsRepository.findById(setId).ifPresent(sets -> {
+            contextListRepository.findById(setId).ifPresent(sets -> {
                 contextRepository.detachContextFromSet(contextId, setId);
             });
         });

@@ -16,7 +16,7 @@ public class ServiceFormImpl implements ServiceForm {
     private final FormRepository formRepository;
     private final TypeFormRepository typeFormRepository;
     private final LexemeRepository lexemeRepository;
-    private final SetsRepository setsRepository;
+    private final ContextListRepository contextListRepository;
     private final FileTableRepository fileTableRepository;
 
     private String getUUID(){
@@ -46,10 +46,10 @@ public class ServiceFormImpl implements ServiceForm {
             lexemeRepository.findById(lexemeId).ifPresent(form::setLexeme);
         }
 
-        Set<Sets> setsToBase=new HashSet<>();
-        Set<Sets> setsFromForm=new HashSet<>(formDto.getSets());
-        for (Sets sets : setsFromForm) {
-            setsRepository.findById(sets.getId()).ifPresent(setsToBase::add);
+        Set<ContextList> contextListToBase =new HashSet<>();
+        Set<ContextList> contextListFromForm =new HashSet<>(formDto.getSets());
+        for (ContextList contextList : contextListFromForm) {
+            contextListRepository.findById(contextList.getId()).ifPresent(contextListToBase::add);
         }
 
 
@@ -64,7 +64,7 @@ public class ServiceFormImpl implements ServiceForm {
                 context.getPhotoFile().setUid(getUUID());
             }
 
-            context.setSets(setsToBase);
+            context.setSets(contextListToBase);
             context.setDef(meaningDto.getDef());
             context.setTranslate(meaningDto.getTranslate());
             List<Example> exampleList = new ArrayList<>();

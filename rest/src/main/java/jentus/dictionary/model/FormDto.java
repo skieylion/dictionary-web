@@ -14,7 +14,7 @@ public class FormDto {
     private long typeId;
     private List<Long> listSetId;
     private List<ContextDto> contextDtoList;
-    private List<Sets> sets;
+    private List<ContextList> sets;
     private FileTable audioFile;
 
     @Override

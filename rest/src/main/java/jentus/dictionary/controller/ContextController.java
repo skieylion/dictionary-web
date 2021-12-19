@@ -204,37 +204,14 @@ public class ContextController {
         return new ContextTable();
     }
 
+    //------------------------
     @GetMapping("/context")
     public List<Context> findAllByIds(@RequestParam(name = "ids[]") List<Long> ids) {
         return serviceContext.findAllByListId(ids);
     }
 
-    @GetMapping("/context/{id}")
-    public Context findById(@PathVariable("id") long id) throws ContextNotFoundException {
-        return serviceContext.findById(id);
-    }
 
-    @DeleteMapping("/context/{id}")
-    public void delete(@PathVariable("id") long id) {
-
-        serviceContext.delete(id);
-    }
-
-    @PostMapping("/context/{id}/event")
-    public void know(@PathVariable("id") long id) {
-        serviceContext.know(id);
-    }
-
-    @DeleteMapping("/context/{id}/event")
-    public void notKnow(@PathVariable("id") long id) {
-        serviceContext.notKnow(id);
-    }
-
-    @PostMapping("/context/{contextId}/repetition")
-    public void repeat(@PathVariable("contextId") long contextId) {
-        serviceContext.repeat(contextId);
-    }
-
+    //-----------------------------------------------------------------
     @PostMapping("/context/{contextId}/set/{setId}")
     public void attachToSet(@PathVariable("contextId") long contextId, @PathVariable("setId") long setId) {
         serviceContext.attachToSet(contextId, setId);
