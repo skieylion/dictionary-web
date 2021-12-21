@@ -26,18 +26,20 @@ public class Context {
     @Column(name = "translate")
     private String translate;
 
-    @ManyToOne(targetEntity = LexemeAndPartOfSpeech.class,fetch = FetchType.EAGER)
+    @ManyToOne(targetEntity = LexemeAndPartOfSpeech.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "lexemeAndPartOfSpeechId")
     private LexemeAndPartOfSpeech lexemeAndPartOfSpeech;
 
-    @ManyToOne(targetEntity = FileTable.class,fetch = FetchType.EAGER)
+    @ManyToOne(targetEntity = FileTable.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "photoId")
     private FileTable photoFile;
 
-    @OneToMany(targetEntity = Example.class, mappedBy = "context", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(targetEntity = Example.class,mappedBy = "context", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<Example> examples;
 
     @OneToMany(targetEntity = ContextEvent.class, mappedBy = "context", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<ContextEvent> contextEvents;
 
 }

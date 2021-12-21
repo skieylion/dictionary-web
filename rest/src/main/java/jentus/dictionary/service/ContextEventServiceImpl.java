@@ -20,7 +20,7 @@ public class ContextEventServiceImpl implements ContextEventService {
         contextRepository.findById(contextId).ifPresent(context -> {
             ContextEvent contextEvent =new ContextEvent();
             contextEvent.setContext(context);
-            contextEvent.setTs(new Date());
+            contextEvent.setEventDate(new Date());
             contextEventRepository.save(contextEvent);
         });
     }

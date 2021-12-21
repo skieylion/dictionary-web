@@ -3,6 +3,7 @@ package jentus.dictionary.repository;
 import jentus.dictionary.model.ContextDb;
 import jentus.dictionary.model.ContextSortField;
 import jentus.dictionary.model.ContextParams;
+import jentus.dictionary.model.ContextSortType;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -19,31 +20,31 @@ public class ContextRepositoryCustomImpl implements ContextRepositoryCustom {
 
     private final static String SQL_SELECT_ALL = "" +
             "select " +
-            "   ctx.id," +
-            "   ce.contextStatusId" +
-            "from Context ctx" +
-            "left join ce" +
-            "on ce.contextId=ctx.id";
+            "   ctx.id, " +
+            "   ce.contextStatusId " +
+            "from Context ctx " +
+            "left join ce " +
+            "on ce.contextId=ctx.id ";
 
     @PersistenceContext
     private final EntityManager em;
 
     @Override
     public List<ContextDb> findByParams(ContextParams contextParams) {
-        final int offset= contextParams.getOffset();
-        final int limit= contextParams.getLimit();
+        final int offset = contextParams.getOffset();
+        final int limit = contextParams.getLimit();
         final var request = new StringBuilder();
 
         request.append(
-            "with clis as ( "+
-                "with ce as (" +
-                "   select distinct on (evt.contextId) " +
-                "      evt.contextId," +
-                "      evt.eventDate, " +
-                "      evt.contextStatusId" +
-                "   from ContextEvent evt" +
-                "   order by contextId, eventDate desc "+
-                ")"
+                "with clist as ( " +
+                        "with ce as (" +
+                        "   select distinct on (evt.contextId) " +
+                        "      evt.contextId," +
+                        "      evt.eventDate, " +
+                        "      evt.contextStatusId" +
+                        "   from ContextEvent evt" +
+                        "   order by contextId, eventDate desc " +
+                        ")"
         );
 
         final var ids = contextParams.getContextListIds();
@@ -62,15 +63,15 @@ public class ContextRepositoryCustomImpl implements ContextRepositoryCustom {
         }
 
         request.append(
-            " )"+
-            " select" +
-            "   clist.id," +
-            "   clist.contextStatusId" +
-            "from clist "
+                " )" +
+                        " select" +
+                        "   clist.id, " +
+                        "   clist.contextStatusId " +
+                        " from clist "
         );
 
         if (contextParams.getContextSortField() == ContextSortField.STATUS) {
-            final var order=contextParams.isDesc()?"DESC":"ASC";
+            final var order = contextParams.getContextSortType() == ContextSortType.DESC ? "DESC" : "ASC";
             request.append(" ORDER BY clist.contextStatusId ").append(order).append(" ");
         }
         request.append(" OFFSET ").append(offset).append(" LIMIT ").append(limit).append(" ");
@@ -81,8 +82,10 @@ public class ContextRepositoryCustomImpl implements ContextRepositoryCustom {
             query.setParameter(i, ids.get(i));
         }
 
-        List<ContextDb> contextDbList=query.getResultList();
-        contextDbList=contextDbList!=null?contextDbList:new ArrayList<>();
+        //System.out.println(request.toString());
+
+        List<ContextDb> contextDbList = query.getResultList();
+        contextDbList = contextDbList != null ? contextDbList : new ArrayList<>();
 
         return contextDbList;
     }

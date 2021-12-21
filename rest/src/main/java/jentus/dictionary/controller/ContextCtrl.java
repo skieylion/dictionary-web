@@ -5,10 +5,11 @@ import jentus.dictionary.exception.ContextStatusNotFoundException;
 import jentus.dictionary.exception.ContextStatusNotSetException;
 import jentus.dictionary.model.ContextParams;
 import jentus.dictionary.model.ContextSortField;
+import jentus.dictionary.model.ContextSortType;
 import jentus.dictionary.model.dto.ContextDto;
 import jentus.dictionary.model.ContextStatusType;
 import jentus.dictionary.service.ContextStatusService;
-import jentus.dictionary.service.ServiceContext;
+import jentus.dictionary.service.ContextService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ContextCtrl {
     private final ContextStatusService contextStatusService;
-    private final ServiceContext serviceContext;
+    private final ContextService contextService;
 
     @PostMapping("/Context/{id}/ContextStatus/{status}")
     public void setStatus(@PathVariable("id") long contextId, @PathVariable("status") String status) throws ContextStatusNotSetException, ContextStatusNotFoundException {
@@ -26,21 +27,21 @@ public class ContextCtrl {
     }
     @DeleteMapping("/Context/{id}")
     public void delete(@PathVariable("id") long id) {
-        serviceContext.delete(id);
+        contextService.delete(id);
     }
     @GetMapping("/Context/{id}")
     public ContextDto findById(@PathVariable("id") long id) throws ContextNotFoundException {
-        return serviceContext.findById(id);
+        return contextService.findById(id);
     }
 
     @GetMapping("/Context")
     public List<ContextDto> findAll(
             @RequestParam(name = "limit") int limit,
             @RequestParam(name = "offset") int offset,
-            @RequestParam(name = "contextListIds[]", required = false) List<Long> contextListIds,
+            @RequestParam(name = "contextListIds", required = false) List<Long> contextListIds,
             @RequestParam(name = "isUnionAll",required = false,defaultValue = "false") boolean isUnionAll,
             @RequestParam(name = "sortByField", required = false) ContextSortField sortByField,
-            @RequestParam(name = "sortByOrder", required = false) Boolean sortByOrder
+            @RequestParam(name = "sortByOrder", required = false) ContextSortType sortByOrder
     ) {
         ContextParams contextParams=new ContextParams();
         contextParams.setLimit(limit);
@@ -48,9 +49,9 @@ public class ContextCtrl {
         contextParams.setContextListIds(contextListIds);
         contextParams.setUnionAll(isUnionAll);
         contextParams.setContextSortField(sortByField);
-        contextParams.setIsDesc(sortByOrder);
+        contextParams.setContextSortType(sortByOrder);
 
-        return serviceContext.findByParams(contextParams);
+        return contextService.findByParams(contextParams);
     }
 
 

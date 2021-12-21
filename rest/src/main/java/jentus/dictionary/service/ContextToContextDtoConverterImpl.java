@@ -31,7 +31,7 @@ public class ContextToContextDtoConverterImpl implements ContextToContextDtoConv
             exampleDto.setText(example.getText());
             exampleDtoList.add(exampleDto);
         });
-        contextDto.setExampleDtoList(exampleDtoList);
+        contextDto.setExampleList(exampleDtoList);
         contextDto.setStatus(contextStatusService.getContextStatusDtoByContext(context));
 
         return contextDto;

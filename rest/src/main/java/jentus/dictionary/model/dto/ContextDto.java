@@ -1,5 +1,6 @@
 package jentus.dictionary.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonRootName;
 import jentus.dictionary.model.ContextStatusType;
 import jentus.dictionary.model.FileTable;
 import lombok.Data;
@@ -12,5 +13,5 @@ public class ContextDto {
     private ContextStatusDto status;
     private String definition;
     private String translate;
-    private List<ExampleDto> exampleDtoList;
+    private List<ExampleDto> exampleList;
 }

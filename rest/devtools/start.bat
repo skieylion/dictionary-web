@@ -1,1 +1,0 @@
-mvn clean package & call devtools\build.bat & call devtools\run.bat

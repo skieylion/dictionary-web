@@ -1,11 +1,9 @@
 package jentus.dictionary.controller;
 
-import jentus.dictionary.model.ContextList;
-import jentus.dictionary.model.ContextParams;
-import jentus.dictionary.model.ContextSortField;
+import jentus.dictionary.model.*;
 import jentus.dictionary.model.dto.ContextDto;
 import jentus.dictionary.service.ContextListService;
-import jentus.dictionary.service.ServiceContext;
+import jentus.dictionary.service.ContextService;
 import lombok.AllArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +17,7 @@ import java.util.List;
 public class ContextListCtrl {
 
     private final ContextListService contextListService;
-    private final ServiceContext serviceContext;
+    private final ContextService contextService;
 
     @GetMapping("/ContextList")
     @ResponseBody
@@ -44,38 +42,64 @@ public class ContextListCtrl {
             @RequestParam(name = "limit") int limit,
             @RequestParam(name = "offset") int offset,
             @RequestParam(name = "contextListIds[]", required = false) List<Long> contextListIds,
-            @RequestParam(name = "isUnionAll",required = false,defaultValue = "false") boolean isUnionAll,
+            @RequestParam(name = "isUnionAll", required = false, defaultValue = "false") boolean isUnionAll,
             @RequestParam(name = "sortByField", required = false) ContextSortField sortByField,
-            @RequestParam(name = "sortByOrder", required = false) Boolean sortByOrder
+            @RequestParam(name = "sortByOrder", required = false) ContextSortType sortByOrder
     ) {
-        ContextParams contextParams=new ContextParams();
+        ContextParams contextParams = new ContextParams();
         contextParams.setLimit(limit);
         contextParams.setOffset(offset);
         contextParams.setContextListIds(contextListIds);
         contextParams.setUnionAll(isUnionAll);
         contextParams.setContextSortField(sortByField);
-        contextParams.setIsDesc(sortByOrder);
+        contextParams.setContextSortType(sortByOrder);
 
-        return serviceContext.findByParams(contextParams);
+        return contextService.findByParams(contextParams);
     }
+
     @GetMapping("ContextList/{id}/Context")
     public List<ContextDto> findContextByContextListId(
             @PathVariable("id") long id,
             @RequestParam(name = "limit") int limit,
             @RequestParam(name = "offset") int offset,
             @RequestParam(name = "sortByField", required = false) ContextSortField sortByField,
-            @RequestParam(name = "sortByOrder", required = false) Boolean sortByOrder
+            @RequestParam(name = "sortByOrder", required = false) ContextSortType sortByOrder
     ) {
-        List<Long> contextListIds= Collections.singletonList(id);
-        ContextParams contextParams=new ContextParams();
+        List<Long> contextListIds = Collections.singletonList(id);
+        ContextParams contextParams = new ContextParams();
         contextParams.setLimit(limit);
         contextParams.setOffset(offset);
         contextParams.setUnionAll(false);
         contextParams.setContextListIds(contextListIds);
         contextParams.setContextSortField(sortByField);
-        contextParams.setIsDesc(sortByOrder);
+        contextParams.setContextSortType(sortByOrder);
 
-        return serviceContext.findByParams(contextParams);
+        return contextService.findByParams(contextParams);
     }
 
+
+    @GetMapping("ContextList/{contextListId}/Context/{contextId}")
+    public void action(
+            @PathVariable("contextListId") long contextListId,
+            @PathVariable("contextId") long contextId,
+            @RequestParam(name = "action") ContextListAction action
+    ) {
+        switch (action) {
+            case ATTACH:
+                contextListService.attachToList(contextListId, contextId);
+                break;
+            case DETACH:
+                contextListService.detachFromList(contextListId, contextId);
+                break;
+        }
+    }
+
+    @GetMapping("ContextList/{contextListId}/Context/ContextStatus")
+    public List<ContextDto> findContextByContextListIdWithStatus(
+            @PathVariable("contextListId") long contextListId,
+            @RequestParam(name = "limit") long limit,
+            @RequestParam(name = "status") List<ContextStatusType> statusTypeList
+    ) {
+        return contextListService.findContextByStatusList(contextListId, limit, statusTypeList);
+    }
 }

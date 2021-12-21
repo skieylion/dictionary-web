@@ -13,7 +13,7 @@ public class DictionaryApplication {
 
     public static void main(String[] args) {
         ApplicationContext context=SpringApplication.run(DictionaryApplication.class, args);
-        context.getBean(RunnerImpl.class).run();
+        //context.getBean(RunnerImpl.class).run();
     }
 
 }

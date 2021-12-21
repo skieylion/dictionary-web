@@ -2,12 +2,15 @@ package jentus.dictionary.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "Example")
-@Data
+@Getter
+@Setter
 public class Example {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,9 +19,8 @@ public class Example {
     @Column(name = "text")
     private String text;
 
-
     @ManyToOne(targetEntity = Context.class)
-    @JoinColumn(name = "refMeaning")
+    @JoinColumn(name = "contextId")
     @JsonIgnore
     private Context context;
 }

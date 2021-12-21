@@ -7,11 +7,9 @@ import jentus.dictionary.model.dto.ContextDto;
 
 import java.util.List;
 
-public interface ServiceContext {
+public interface ContextService {
     List<Context> findAllByListId(List<Long> listId);
     ContextDto findById(long id) throws ContextNotFoundException;
     void delete(long id);
     List<ContextDto> findByParams(ContextParams contextParams);
-    void attachToSet(long contextId,long setId);
-    void detachFromSet(long contextId,long setId);
 }

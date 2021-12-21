@@ -1,6 +1,5 @@
 package jentus.dictionary.service;
 
-import jentus.dictionary.controller.ContextController;
 import jentus.dictionary.exception.ContextStatusNotFoundException;
 import jentus.dictionary.exception.ContextStatusNotSetException;
 import jentus.dictionary.model.*;

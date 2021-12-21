@@ -15,6 +15,6 @@ public class ContextParams {
     private int offset;
     private int limit;
     private ContextSortField contextSortField;
-    private Boolean isDesc;
+    private ContextSortType contextSortType;
 
 }

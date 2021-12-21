@@ -1,1 +1,0 @@
-call devtools\stop.bat & call devtools\cleanup.bat & mvn clean

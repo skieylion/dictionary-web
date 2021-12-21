@@ -1,1 +1,0 @@
-devtools\destroy.bat & devtools\start.bat

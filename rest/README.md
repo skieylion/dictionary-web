@@ -17,7 +17,7 @@
       - offset : ...
 - ### +/ContextList/Context
   - GET : it is the same /ContextList/{id}/Context but a search is in all lists
-- ### ? /ContextList/{contextListId}/Context/{contextId}
+- ### /ContextList/{contextListId}/Context/{contextId}
     - #### {contextListId} : a context list id (1,2,...N)
     - #### {contextId} : a context id (1,2,...N)
     - POST : attach to a ContextList or detach from a ContextList 
