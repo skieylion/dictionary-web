@@ -5,9 +5,9 @@ import lombok.Data;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "ContextList")
+@Table(name = "PartOfSpeech")
 @Data
-public class ContextList {
+public class PartOfSpeech {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -15,11 +15,4 @@ public class ContextList {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "description")
-    private String description;
-
-    @Override
-    public int hashCode(){
-        return (int)id;
-    }
 }

@@ -11,8 +11,6 @@ import java.util.List;
 
 @Repository
 public interface ContextRepository extends CrudRepository<Context,Long>, ContextRepositoryCustom {
-    List<Context> findAll();
-
     @Modifying
     @Query(value = "delete SetAndContext where setId=:setId and contextId=:contextId",nativeQuery = true)
     void detachContextFromSet(@Param("contextId") long contextId, @Param("setId") long setId);

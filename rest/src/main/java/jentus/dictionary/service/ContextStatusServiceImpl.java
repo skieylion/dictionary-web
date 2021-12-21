@@ -1,10 +1,10 @@
 package jentus.dictionary.service;
 
+import jentus.dictionary.controller.ContextController;
 import jentus.dictionary.exception.ContextStatusNotFoundException;
 import jentus.dictionary.exception.ContextStatusNotSetException;
-import jentus.dictionary.model.ContextEvent;
-import jentus.dictionary.model.ContextStatus;
-import jentus.dictionary.model.ContextStatusType;
+import jentus.dictionary.model.*;
+import jentus.dictionary.model.dto.ContextStatusDto;
 import jentus.dictionary.repository.ContextEventRepository;
 import jentus.dictionary.repository.ContextRepository;
 import jentus.dictionary.repository.ContextStatusRepository;
@@ -12,14 +12,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class ContextStatusServiceImpl implements ContextStatusService {
 
     private final ContextRepository contextRepository;
     private final ContextEventRepository contextEventRepository;
-    private final ContextStatus contextStatusRepeat;
+    private final ContextStatus contextStatusRepeated;
     private final ContextStatus contextStatusStudied;
 
     public ContextStatusServiceImpl(
@@ -31,7 +33,7 @@ public class ContextStatusServiceImpl implements ContextStatusService {
     ) throws ContextStatusNotFoundException {
         this.contextRepository = contextRepository;
         this.contextEventRepository = contextEventRepository;
-        this.contextStatusRepeat = contextStatusRepository.findById(repeatedId).orElseThrow(ContextStatusNotFoundException::new);
+        this.contextStatusRepeated = contextStatusRepository.findById(repeatedId).orElseThrow(ContextStatusNotFoundException::new);
         this.contextStatusStudied = contextStatusRepository.findById(studiedId).orElseThrow(ContextStatusNotFoundException::new);
     }
 
@@ -45,7 +47,7 @@ public class ContextStatusServiceImpl implements ContextStatusService {
                 this.contextRepository.findById(contextId).ifPresent(context -> {
                     ContextEvent contextEvent = new ContextEvent();
                     contextEvent.setContext(context);
-                    contextEvent.setTs(new Date());
+                    contextEvent.setEventDate(new Date());
                     contextEvent.setContextStatus(contextStatus);
                     contextEventRepository.save(contextEvent);
                 });
@@ -62,12 +64,71 @@ public class ContextStatusServiceImpl implements ContextStatusService {
     public ContextStatus getContextStatusByContextStatusType(ContextStatusType contextStatusType) throws ContextStatusNotFoundException {
         switch (contextStatusType) {
             case REPEATED:
-                return contextStatusRepeat;
+                return contextStatusRepeated;
             case STUDIED:
                 return contextStatusStudied;
             default:
                 throw new ContextStatusNotFoundException();
         }
+    }
+
+    @Override
+    public ContextStatusDto getContextStatusDtoByContext(Context context) {
+        List<ContextEvent> contextEventList = context.getContextEvents();
+        int size=contextEventList!=null?contextEventList.size():0;
+        if(size==0) return new ContextStatusDto(ContextStatusType.NEW,0,ContextTimeUnit.NONE);
+
+        List<Date> dateList = new ArrayList<>();
+        for (ContextEvent contextEvent : contextEventList) {
+            if (contextEvent.getContextStatus().getId() == contextStatusRepeated.getId()) {
+                dateList.add(contextEvent.getEventDate());
+            } else if (contextEvent.getContextStatus().getId() == contextStatusStudied.getId()) {
+                return new ContextStatusDto(ContextStatusType.STUDIED,0, ContextTimeUnit.NONE);
+            }
+        }
+
+        dateList.sort(Date::compareTo);
+        int sizeDateList = dateList.size();
+
+        Date last = sizeDateList > 0 ? dateList.get(dateList.size() - 1) : null;
+        size = last != null ? size : 0;
+        Date current = new Date();
+        double offset = size > 0 ? (double) (current.getTime() - last.getTime()) / 1000 / 60 : 0;
+
+        switch (size) {
+            case 0:
+                return new ContextStatusDto(ContextStatusType.NEW,0,ContextTimeUnit.NONE);
+            case 1:
+                if (offset < 30) {
+                    return new ContextStatusDto(ContextStatusType.REPEATED,Math.ceil(30 - offset),ContextTimeUnit.MIN);
+                }
+                break;
+            case 2:
+                offset = offset / 60;
+                if (offset < 24) {
+                    return new ContextStatusDto(ContextStatusType.REPEATED,Math.ceil(24 - offset),ContextTimeUnit.HOUR);
+                }
+                break;
+            case 3:
+                offset = offset / 60;
+                var week3 = 24 * 7 * 3;
+                if (offset < week3) {
+                    return new ContextStatusDto(ContextStatusType.REPEATED,Math.ceil((week3 - offset) / 24),ContextTimeUnit.DAY);
+                }
+                break;
+            case 4:
+                offset = offset / 60;
+                var month3 = 24 * 7 * 4 * 3;
+                if (offset < month3) {
+                    return new ContextStatusDto(ContextStatusType.REPEATED,Math.ceil((month3 - offset) / 24),ContextTimeUnit.DAY);
+                }
+                break;
+            default:
+                return new ContextStatusDto(ContextStatusType.STUDIED,0, ContextTimeUnit.NONE);
+        }
+
+
+        return null;
     }
 
 }

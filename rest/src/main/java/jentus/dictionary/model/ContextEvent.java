@@ -20,20 +20,20 @@ public class ContextEvent implements Comparable<ContextEvent> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "ts")
-    private Date ts;
-
-    @ManyToOne(targetEntity = Context.class)
-    @JoinColumn(name = "contextId")
-    @JsonIgnore
-    private Context context;
+    @Column(name = "eventDate")
+    private Date eventDate;
 
     @ManyToOne(targetEntity = ContextStatus.class)
-    @JoinColumn(name = "statusId")
+    @JoinColumn(name = "contextStatusId")
     private ContextStatus contextStatus;
 
     @Override
     public int compareTo(ContextEvent o) {
-        return o.getTs().compareTo(getTs());
+        return o.getEventDate().compareTo(getEventDate());
     }
+
+    @ManyToOne(targetEntity = Context.class,fetch = FetchType.EAGER)
+    @JoinColumn(name = "contextId")
+    private Context context;
+
 }

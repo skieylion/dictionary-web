@@ -1,6 +1,5 @@
 package jentus.dictionary.controller;
 
-import jentus.dictionary.exception.ContextNotFoundException;
 import jentus.dictionary.model.*;
 import jentus.dictionary.service.ServiceContext;
 import lombok.AllArgsConstructor;
@@ -49,74 +48,7 @@ public class ContextController {
         private Integer count;
     }
 
-    private ContextStatus getContextStatus(Context context) {
-        ContextStatus eventState = new ContextStatus();
-        List<ContextEvent> contextEventList = context.getContextEvent();
-        if (contextEventList == null) contextEventList = new ArrayList<>();
-        int size = contextEventList.size();
 
-        List<Date> dateList = new ArrayList<>();
-
-        for (ContextEvent contextEvent : contextEventList) {
-            if (contextEvent.getContextStatus().getId() == 1) {
-                dateList.add(contextEvent.getTs());
-            } else if (contextEvent.getContextStatus().getId() == 2) {
-                eventState.state = "studied";
-                return eventState;
-            }
-        }
-        dateList.sort(Date::compareTo);
-        int sizeDateList = dateList.size();
-
-        Date last = sizeDateList > 0 ? dateList.get(dateList.size() - 1) : null;
-        size = last != null ? size : 0;
-        Date current = new Date();
-        double offset = size > 0 ? (double) (current.getTime() - last.getTime()) / 1000 / 60 : 0;
-        eventState.state = "repeat";
-        eventState.count = size;
-
-        switch (size) {
-            case 0:
-                eventState.state = "new";
-                break;
-            case 1:
-                if (offset < 30) {
-                    eventState.state = "repeated";
-                    eventState.offset = Math.ceil(30 - offset);
-                    eventState.unit = "мин.";
-                }
-                break;
-            case 2:
-                offset = offset / 60;
-                if (offset < 24) {
-                    eventState.state = "repeated";
-                    eventState.offset = Math.ceil(24 - offset);
-                    eventState.unit = "ч.";
-                }
-                break;
-            case 3:
-                offset = offset / 60;
-                var week3 = 24 * 7 * 3;
-                if (offset < week3) {
-                    eventState.state = "repeated";
-                    eventState.offset = Math.ceil((week3 - offset) / 24);
-                    eventState.unit = "дн.";
-                }
-                break;
-            case 4:
-                offset = offset / 60;
-                var month3 = 24 * 7 * 4 * 3;
-                if (offset < month3) {
-                    eventState.state = "repeated";
-                    eventState.offset = Math.ceil((month3 - offset) / 24);
-                    eventState.unit = "дн.";
-                }
-                break;
-            default:
-                eventState.state = "studied";
-        }
-        return eventState;
-    }
 
     private String getStatus(Context context) {
         ContextStatus contextStatus = getContextStatus(context);
@@ -176,12 +108,12 @@ public class ContextController {
                 UUID uuid = UUID.randomUUID();
                 ContextTableData contextTableData = new ContextTableData();
                 contextTableData.setRowId(String.valueOf(context.getId()));
-                contextTableData.setWord(context.getForm().getValue());
-                contextTableData.setTypeOf(context.getForm().getType().getName());
-                contextTableData.setDef(context.getDef());
+//                contextTableData.setWord(context.getLexeme().getValue());
+//                contextTableData.setTypeOf(context.getLexeme().getType().getName());
+//                contextTableData.setDef(context.getDef());
                 contextTableData.setStatus(getStatus(context));
                 StringBuilder examples = new StringBuilder();
-                List<Example> exampleList = context.getExamples();
+                List<Example> exampleList = null;// context.getExamples();
                 int index = Math.min(exampleList.size(), 3);
                 exampleList = exampleList.subList(0, index);
                 exampleList.forEach(example -> {

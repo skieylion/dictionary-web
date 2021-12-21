@@ -1,5 +1,6 @@
 package jentus.dictionary.model;
 
+import jentus.dictionary.model.dto.ContextDto;
 import lombok.Data;
 
 import java.util.List;

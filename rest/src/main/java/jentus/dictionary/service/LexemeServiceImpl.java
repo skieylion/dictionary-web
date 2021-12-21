@@ -11,11 +11,10 @@ import java.util.*;
 
 @Service
 @AllArgsConstructor
-public class ServiceFormImpl implements ServiceForm {
+public class LexemeServiceImpl implements LexemeService {
 
-    private final FormRepository formRepository;
-    private final TypeFormRepository typeFormRepository;
     private final LexemeRepository lexemeRepository;
+    private final PartOfSpeechRepository partOfSpeechRepository;
     private final ContextListRepository contextListRepository;
     private final FileTableRepository fileTableRepository;
 
@@ -23,27 +22,27 @@ public class ServiceFormImpl implements ServiceForm {
         return UUID.randomUUID().toString();
     }
 
-    @Transactional
-    public void save(FormDto formDto) {
+    //@Transactional
+    public void save2(FormDto formDto) {
         FileTable fileTable=formDto.getAudioFile();
-        if(fileTable!=null&&!(fileTable.getUid()!=null&&fileTable.getUid()!="")){
-            fileTable.setUid(getUUID());
-        }
+//        if(fileTable!=null&&!(fileTable.getUid()!=null&&fileTable.getUid()!="")){
+//            fileTable.setUid(getUUID());
+//        }
 
-        Form form = new Form();
+        Lexeme lexeme = new Lexeme();
         Long id=formDto.getId();
-        if(id!=null) form.setId(id);
+        if(id!=null) lexeme.setId(id);
 
-        form.setAudioFile(fileTable);
-        form.setValue(formDto.getValue());
-        form.setMeta(formDto.getMeta());
-        form.setTranscription(formDto.getTranscription());
+        //lexeme.setAudioFile(fileTable);
+        lexeme.setValue(formDto.getValue());
+        lexeme.setMeta(formDto.getMeta());
+        //lexeme.setTranscription(formDto.getTranscription());
 
         long typeId = formDto.getTypeId();
-        typeFormRepository.findById(typeId).ifPresent(form::setType);
+        //partOfSpeechRepository.findById(typeId).ifPresent(lexeme::setType);
         long lexemeId = formDto.getLexemeId();
         if (lexemeId > 0) {
-            lexemeRepository.findById(lexemeId).ifPresent(form::setLexeme);
+            //lexemeRepository.findById(lexemeId).ifPresent(form::setLexeme);
         }
 
         Set<ContextList> contextListToBase =new HashSet<>();
@@ -56,16 +55,16 @@ public class ServiceFormImpl implements ServiceForm {
         List<Context> contextList = new ArrayList<>();
         formDto.getContextDtoList().forEach(meaningDto -> {
             Context context = new Context();
-            context.setForm(form);
+            //context.setLexeme(lexeme);
 
             if(meaningDto.getId()!=null) context.setId(meaningDto.getId());
             context.setPhotoFile(meaningDto.getPhotoFile());
-            if(context.getPhotoFile()!=null&&(context.getPhotoFile().getUid()==null || context.getPhotoFile().getUid().equals(""))){
-                context.getPhotoFile().setUid(getUUID());
-            }
+//            if(context.getPhotoFile()!=null&&(context.getPhotoFile().getUid()==null || context.getPhotoFile().getUid().equals(""))){
+//                context.getPhotoFile().setUid(getUUID());
+//            }
 
-            context.setSets(contextListToBase);
-            context.setDef(meaningDto.getDef());
+//            context.setSets(contextListToBase);
+//            context.setDef(meaningDto.getDef());
             context.setTranslate(meaningDto.getTranslate());
             List<Example> exampleList = new ArrayList<>();
             meaningDto.getExampleDtoList().forEach(exampleDto -> {
@@ -75,19 +74,26 @@ public class ServiceFormImpl implements ServiceForm {
                 example.setContext(context);
                 exampleList.add(example);
             });
-            context.setExamples(exampleList);
+            //context.setExamples(exampleList);
             contextList.add(context);
         });
-        form.setContexts(contextList);
-        formRepository.save(form);
+        //lexeme.setContexts(contextList);
+        lexemeRepository.save(lexeme);
         //добавить слова к наборам
 
 
     }
 
+
     @Override
-    public List<Form> findAll() {
-        return formRepository.findAll();
+    @Transactional
+    public void save(Lexeme lexeme) {
+        lexemeRepository.save(lexeme);
+    }
+
+    @Override
+    public List<Lexeme> findAll() {
+        return lexemeRepository.findAll();
     }
 
 }

@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Search {
-    private String regex;
-    private String value;
+public class ContextDb {
+    private Long id;
+    private Integer contextStatusId;
 }

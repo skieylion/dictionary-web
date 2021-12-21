@@ -1,8 +1,8 @@
 package jentus.dictionary.controller;
 
-import jentus.dictionary.model.Form;
+import jentus.dictionary.model.Lexeme;
 import jentus.dictionary.model.FormDto;
-import jentus.dictionary.service.ServiceForm;
+import jentus.dictionary.service.LexemeService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,17 +13,17 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-public class FormController {
+public class LexemeCtrl {
 
-    private final ServiceForm serviceForm;
+    private final LexemeService lexemeService;
 
-    @PostMapping("/form")
-    public void save(@RequestBody FormDto form) {
-        serviceForm.save(form);
+    @PostMapping("/Lexeme")
+    public void save(@RequestBody Lexeme lexeme) {
+        lexemeService.save(lexeme);
     }
 
-    @GetMapping("/form")
-    public List<Form> findAll() {
-        return serviceForm.findAll();
+    @GetMapping("/Lexeme") // ?
+    public List<Lexeme> findAll() {
+        return lexemeService.findAll();
     }
 }

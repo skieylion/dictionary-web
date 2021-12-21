@@ -1,23 +1,43 @@
 package jentus.dictionary.model;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.ToString;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "Lexeme")
 @Data
-@AllArgsConstructor
 public class Lexeme {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "lexeme")
-    private String lexeme;
+    @Column(name = "value")
+    private String value;
 
-    public Lexeme() {
+    @Column(name = "meta")
+    private String meta;
 
-    }
+//    @Column(name="transcription")
+//    private String transcription;
+//
+//    @ManyToOne(targetEntity = PartOfSpeech.class,cascade = CascadeType.ALL)
+//    @JoinColumn(name = "typeId")
+//    private PartOfSpeech type;
+//
+//    @Fetch(FetchMode.SUBSELECT)
+//    @OneToMany(targetEntity = Context.class,mappedBy = "form",fetch = FetchType.EAGER,cascade = CascadeType.ALL,orphanRemoval = false)
+//    @JsonIgnore
+//    @ToString.Exclude
+//    private List<Context> contexts;
+//
+//    @ManyToOne(targetEntity = FileTable.class,cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+//    @JoinColumn(name = "audioFile")
+//    private FileTable audioFile;
+
 }

@@ -13,57 +13,31 @@ import java.util.Set;
 
 @Entity
 @Table(name = "Context")
+@Getter
+@Setter
 public class Context {
-
-    @Getter
-    @Setter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Getter
-    @Setter
     @Column(name = "definition")
-    private String def;
+    private String definition;
 
-    @Getter
-    @Setter
     @Column(name = "translate")
     private String translate;
 
-    @Getter
-    @Setter
-    @ManyToOne(targetEntity = Form.class,fetch = FetchType.EAGER)
-    @JoinColumn(name = "refForm")
-    @JsonIgnoreProperties(value = {"hibernateLazyInitializer"}) //"applications",
-    private Form form;
+    @ManyToOne(targetEntity = LexemeAndPartOfSpeech.class,fetch = FetchType.EAGER)
+    @JoinColumn(name = "lexemeAndPartOfSpeechId")
+    private LexemeAndPartOfSpeech lexemeAndPartOfSpeech;
 
-    @Getter
-    @Setter
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "SetAndContext",
-            joinColumns = {@JoinColumn(name = "contextId")},
-            inverseJoinColumns = {@JoinColumn(name = "setId")}
-    )
-    private Set<ContextList> sets = new HashSet<>();
+    @ManyToOne(targetEntity = FileTable.class,fetch = FetchType.EAGER)
+    @JoinColumn(name = "photoId")
+    private FileTable photoFile;
 
-    @Getter
-    @Setter
-    @Fetch(FetchMode.SUBSELECT)
     @OneToMany(targetEntity = Example.class, mappedBy = "context", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Example> examples;
 
-    @Getter
-    @Setter
-    @ManyToOne(targetEntity = FileTable.class,fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    @JoinColumn(name = "photo")
-    @JsonIgnoreProperties(value = {"hibernateLazyInitializer"}) //"applications",
-    private FileTable photoFile;
+    @OneToMany(targetEntity = ContextEvent.class, mappedBy = "context", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<ContextEvent> contextEvents;
 
-    @Getter
-    @Setter
-    @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = ContextEvent.class, mappedBy = "context", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
-    private List<ContextEvent> contextEvent;
 }
