@@ -4,13 +4,16 @@ services:
   rest:
     depends_on:
       - db
-      - pgadmin
+      #- pgadmin
     build:
       context: ./rest
       dockerfile: Dockerfile
     ports:
       - 8081:8081
   db:
+    networks:
+      skynet:
+        ipv4_address: 10.0.1.100
     container_name: postgresql_db
     image: postgres
     restart: always
@@ -23,21 +26,13 @@ services:
       - "5432:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
-  pgadmin:
-    container_name: pgadmin4
-    image: dpage/pgadmin4
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: root@root.com
-      PGADMIN_DEFAULT_USER: root
-      PGADMIN_DEFAULT_PASSWORD: root
-    depends_on:
-      - db
-    ports:
-      - "5050:80"
-    volumes:
-      - pgadmin-data:/var/lib/pgadmin
+networks:
+  skynet:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.0.1.0/24
 volumes:
   db-data:
   pgadmin-data:
-  

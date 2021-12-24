@@ -19,12 +19,14 @@ public class ContextListCtrl {
     private final ContextListService contextListService;
     private final ContextService contextService;
 
+    @CrossOrigin("http://localhost:3000")
     @GetMapping("/ContextList")
     @ResponseBody
     public List<ContextList> findAll() {
         return contextListService.findAll();
     }
 
+    @CrossOrigin("http://localhost:3000")
     @PostMapping("/ContextList")
     @Transactional
     public void save(@RequestBody ContextList contextList) {

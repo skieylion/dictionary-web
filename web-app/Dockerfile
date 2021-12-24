@@ -1,14 +1,11 @@
 FROM node
 
-WORKDIR /app
+WORKDIR /web-app
 
 COPY package.json .
-
-RUN npm install
-
-COPY node_modules .
-COPY public .
-COPY src .
+COPY node_modules ./node_modules
+COPY public ./public
+COPY src ./src
 
 EXPOSE 3000
 

@@ -58,6 +58,7 @@ export default function Context() {
           columns={columns}
           pageSize={12}
           checkboxSelection
+          rowCount={200}
         />
       </div>
     </Stack>
