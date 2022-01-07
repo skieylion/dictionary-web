@@ -11,19 +11,19 @@ import java.util.*;
 
 @Service
 @AllArgsConstructor
-public class LexemeServiceImpl implements LexemeService {
+public class ExpressionServiceImpl implements ExpressionService {
 
-    private final LexemeRepository lexemeRepository;
+    private final ExpressionRepository expressionRepository;
 
     @Override
     @Transactional
-    public void save(Lexeme lexeme) {
-        lexemeRepository.save(lexeme);
+    public void save(Expression expression) {
+        expressionRepository.save(expression);
     }
 
     @Override
-    public List<Lexeme> findAll() {
-        return lexemeRepository.findAll();
+    public List<Expression> findAll() {
+        return expressionRepository.findAll();
     }
 
 }

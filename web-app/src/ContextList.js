@@ -8,6 +8,8 @@ import TextField from '@mui/material/TextField';
 import Checkbox from '@mui/material/Checkbox';
 import { getBottomNavigationUtilityClass } from '@mui/material';
 
+import {Link} from 'react-router-dom'
+
 const axios=require('axios').default;
 
 export default class ContextList extends Component{
@@ -61,6 +63,7 @@ export default class ContextList extends Component{
         contextList.shift();
       }
       _this.forceUpdate();
+      window.location.reload();
     }
     const changeName=function(cl,e){
       cl.name=e.target.value;
@@ -142,7 +145,7 @@ export default class ContextList extends Component{
                             </Stack>
                           :
                             <Stack spacing={2} direction="row" hidden>
-                              <Button variant="contained">Просмотр</Button>
+                              <Button variant="contained" component={Link} to={"/ContextList/"+cl.id+"/Context"}>Просмотр</Button>
                               <Button variant="contained" onClick={function(){clickEdit(cl)}}>Редактировать</Button>
                               <Button variant="contained">Изучать</Button>
                             </Stack>

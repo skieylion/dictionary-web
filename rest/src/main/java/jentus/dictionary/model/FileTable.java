@@ -2,6 +2,7 @@ package jentus.dictionary.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 
@@ -12,6 +13,7 @@ import javax.persistence.*;
 public class FileTable {
 
     @Id
+    @Type(type="pg-uuid")
     private String fileId;
 
     @Column(name = "name")

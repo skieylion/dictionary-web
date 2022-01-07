@@ -2,11 +2,10 @@ package jentus.dictionary.service;
 
 import jentus.dictionary.exception.ContextNotFoundException;
 import jentus.dictionary.model.*;
-import jentus.dictionary.model.dto.ContextDto;
+import jentus.dictionary.model.dto.ContextDtoReader;
 import jentus.dictionary.repository.ContextAndContextListRepository;
-import jentus.dictionary.repository.ContextEventRepository;
 import jentus.dictionary.repository.ContextRepository;
-import jentus.dictionary.repository.ContextListRepository;
+import jentus.dictionary.service.converter.ContextToContextDtoConverter;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +27,7 @@ public class ContextServiceImpl implements ContextService {
 
 
     @Override
-    public ContextDto findById(long id) throws ContextNotFoundException {
+    public ContextDtoReader findById(long id) throws ContextNotFoundException {
         Context context=contextRepository.findById(id).orElseThrow(ContextNotFoundException::new);
         return contextToContextDtoConverter.convert(context);
     }
@@ -39,8 +38,8 @@ public class ContextServiceImpl implements ContextService {
     }
 
     @Override
-    public List<ContextDto> findByParams(ContextParams contextParams) {
-        List<ContextDto> contextDtoList = new ArrayList<>();
+    public List<ContextDtoReader> findByParams(ContextParams contextParams) {
+        List<ContextDtoReader> contextDtoReaderList = new ArrayList<>();
 
         List<ContextDb> contextDbList = contextRepository.findByParams(contextParams);
         if (contextDbList.size() > 0) {
@@ -52,13 +51,13 @@ public class ContextServiceImpl implements ContextService {
             contextDbList.forEach(contextDb -> {
                 contextList.forEach(context -> {
                     if (context.getId() == contextDb.getId()) {
-                        contextDtoList.add(contextToContextDtoConverter.convert(context));
+                        contextDtoReaderList.add(contextToContextDtoConverter.convert(context));
                     }
                 });
             });
         }
 
-        return contextDtoList;
+        return contextDtoReaderList;
     }
 
 

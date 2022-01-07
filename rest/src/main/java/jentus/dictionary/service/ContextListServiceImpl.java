@@ -1,18 +1,18 @@
 package jentus.dictionary.service;
 
-import jentus.dictionary.model.Context;
-import jentus.dictionary.model.ContextAndContextList;
-import jentus.dictionary.model.ContextList;
-import jentus.dictionary.model.ContextStatusType;
-import jentus.dictionary.model.dto.ContextDto;
-import jentus.dictionary.repository.ContextAndContextListRepository;
-import jentus.dictionary.repository.ContextListRepository;
-import jentus.dictionary.repository.ContextRepository;
+import jentus.dictionary.model.*;
+import jentus.dictionary.model.dto.ContextDtoReader;
+import jentus.dictionary.model.dto.ContextDtoWriter;
+import jentus.dictionary.model.dto.ContextListDto;
+import jentus.dictionary.repository.*;
+import jentus.dictionary.service.converter.ContextListToContextListDtoConverter;
+import jentus.dictionary.service.converter.ContextToContextDtoConverter;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -23,6 +23,11 @@ public class ContextListServiceImpl implements ContextListService {
     private final ContextAndContextListRepository contextAndContextListRepository;
     private final ContextRepository contextRepository;
     private final ContextToContextDtoConverter contextToContextDtoConverter;
+    private final ContextListToContextListDtoConverter contextListToContextListDtoConverter;
+    private final ExpressionRepository expressionRepository;
+    private final PartOfSpeechRepository partOfSpeechRepository;
+    private final ExpressionAndPartOfSpeechRepository expressionAndPartOfSpeechRepository;
+
 
     @Override
     @Transactional
@@ -31,8 +36,12 @@ public class ContextListServiceImpl implements ContextListService {
     }
 
     @Override
-    public List<ContextList> findAll() {
-        return contextListRepository.findAll();
+    public List<ContextListDto> findAll() {
+        List<ContextListDto> contextListDtoList = new ArrayList<>();
+        contextListRepository.findAll().forEach(contextList -> {
+            contextListDtoList.add(contextListToContextListDtoConverter.convert(contextList));
+        });
+        return contextListDtoList;
     }
 
     @Override
@@ -67,30 +76,88 @@ public class ContextListServiceImpl implements ContextListService {
     }
 
     @Override
-    public List<ContextDto> findContextByStatusList(long contextListId, long limit, List<ContextStatusType> contextStatusTypeList) {
-        List<ContextDto> contextDtoList = new ArrayList<>();
+    @Transactional
+    public void saveContextByContextListId(long contextListId, ContextDtoWriter contextDtoWriter) {
+
+        contextListRepository.findById(contextListId).ifPresent(contextList -> {
+            Context context = new Context();
+            context.setDefinition(contextDtoWriter.getDefinition());
+            context.setTranslate(contextDtoWriter.getTranslate());
+
+            partOfSpeechRepository.findById(contextDtoWriter.getPartOfSpeechId()).ifPresent(context::setPartOfSpeech);
+
+            expressionRepository
+                    .findByValue(contextDtoWriter.getExpressionValue())
+                    .ifPresentOrElse(expression -> {
+                        System.out.println(1);
+                        context.setExpression(expression);
+                    }, new Runnable() {
+                        @Override
+                        public void run() {
+                            System.out.println(2);
+                            Expression expression = new Expression();
+                            expression.setValue(contextDtoWriter.getExpressionValue());
+                            expressionRepository.save(expression);
+                            context.setExpression(expression);
+                        }
+                    });
+
+            ExpressionAndPartOfSpeech expressionAndPartOfSpeech=new ExpressionAndPartOfSpeech(context.getExpression(),context.getPartOfSpeech());
+            expressionAndPartOfSpeechRepository.save(expressionAndPartOfSpeech);
+
+
+            context.setExamples(new ArrayList<>());
+            contextDtoWriter.getExampleList().forEach(str -> {
+                Example example=new Example();
+                example.setContext(context);
+                example.setText(str);
+                context.getExamples().add(example);
+            });
+
+            context.setContextLists(new HashSet<>());
+            context.getContextLists().add(contextList);
+
+            contextRepository.save(context);
+
+        });
+    }
+
+    @Override
+    public List<ContextDtoReader> findContextByContextListId(long contextListId) {
+        List<ContextDtoReader> contextDtoReaderList = new ArrayList<>();
+        contextListRepository.findById(contextListId).ifPresent(contextList -> {
+            contextList.getContexts().forEach(context -> {
+                contextDtoReaderList.add(contextToContextDtoConverter.convert(context));
+            });
+        });
+        return contextDtoReaderList;
+    }
+
+    @Override
+    public List<ContextDtoReader> findContextByStatusList(long contextListId, long limit, List<ContextStatusType> contextStatusTypeList) {
+        List<ContextDtoReader> contextDtoReaderList = new ArrayList<>();
         contextAndContextListRepository
                 .findByContextListId(contextListId)
                 .ifPresent(contextAndContextList -> {
                     Context context = contextAndContextList.getContext();
-                    ContextDto contextDto = contextToContextDtoConverter.convert(context);
-                    contextDtoList.add(contextDto);
+                    ContextDtoReader contextDtoReader = contextToContextDtoConverter.convert(context);
+                    contextDtoReaderList.add(contextDtoReader);
                 });
 
-        List<ContextDto> contextDtoListResult = new ArrayList<>();
+        List<ContextDtoReader> contextDtoReaderListResult = new ArrayList<>();
 
         for (var status : contextStatusTypeList) {
-            for (var contextDto : contextDtoList) {
+            for (var contextDto : contextDtoReaderList) {
                 if (contextDto.getStatus().getContextStatusType() == status) {
-                    if(contextDtoListResult.size()<limit) {
-                        contextDtoListResult.add(contextDto);
+                    if (contextDtoReaderListResult.size() < limit) {
+                        contextDtoReaderListResult.add(contextDto);
                     } else {
-                        return contextDtoListResult;
+                        return contextDtoReaderListResult;
                     }
                 }
             }
         }
 
-        return contextDtoListResult;
+        return contextDtoReaderListResult;
     }
 }

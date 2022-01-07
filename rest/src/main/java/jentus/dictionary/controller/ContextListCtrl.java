@@ -1,7 +1,10 @@
 package jentus.dictionary.controller;
 
+import jentus.dictionary.exception.ContextNotFoundException;
 import jentus.dictionary.model.*;
-import jentus.dictionary.model.dto.ContextDto;
+import jentus.dictionary.model.dto.ContextDtoReader;
+import jentus.dictionary.model.dto.ContextDtoWriter;
+import jentus.dictionary.model.dto.ContextListDto;
 import jentus.dictionary.service.ContextListService;
 import jentus.dictionary.service.ContextService;
 import lombok.AllArgsConstructor;
@@ -12,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 
+@CrossOrigin("http://localhost:3000")
 @RestController
 @AllArgsConstructor
 public class ContextListCtrl {
@@ -19,14 +23,20 @@ public class ContextListCtrl {
     private final ContextListService contextListService;
     private final ContextService contextService;
 
-    @CrossOrigin("http://localhost:3000")
+    @GetMapping("/ContextList/{contextListId}/Context/{contextId}")
+    public ContextDtoReader findByContextId(
+            @PathVariable("contextListId") long contextListId,
+            @PathVariable("contextId") long contextId
+    ) throws ContextNotFoundException {
+        return contextService.findById(contextId);
+    }
+
     @GetMapping("/ContextList")
     @ResponseBody
-    public List<ContextList> findAll() {
+    public List<ContextListDto> findAll() {
         return contextListService.findAll();
     }
 
-    @CrossOrigin("http://localhost:3000")
     @PostMapping("/ContextList")
     @Transactional
     public void save(@RequestBody ContextList contextList) {
@@ -40,7 +50,7 @@ public class ContextListCtrl {
     }
 
     @GetMapping("ContextList/Context")
-    public List<ContextDto> findAll(
+    public List<ContextDtoReader> findAll(
             @RequestParam(name = "limit") int limit,
             @RequestParam(name = "offset") int offset,
             @RequestParam(name = "contextListIds[]", required = false) List<Long> contextListIds,
@@ -60,44 +70,37 @@ public class ContextListCtrl {
     }
 
     @GetMapping("ContextList/{id}/Context")
-    public List<ContextDto> findContextByContextListId(
-            @PathVariable("id") long id,
-            @RequestParam(name = "limit") int limit,
-            @RequestParam(name = "offset") int offset,
-            @RequestParam(name = "sortByField", required = false) ContextSortField sortByField,
-            @RequestParam(name = "sortByOrder", required = false) ContextSortType sortByOrder
-    ) {
-        List<Long> contextListIds = Collections.singletonList(id);
-        ContextParams contextParams = new ContextParams();
-        contextParams.setLimit(limit);
-        contextParams.setOffset(offset);
-        contextParams.setUnionAll(false);
-        contextParams.setContextListIds(contextListIds);
-        contextParams.setContextSortField(sortByField);
-        contextParams.setContextSortType(sortByOrder);
-
-        return contextService.findByParams(contextParams);
+    public List<ContextDtoReader> findContextByContextListId(@PathVariable("id") long id) {
+        return contextListService.findContextByContextListId(id);
     }
 
-
-    @GetMapping("ContextList/{contextListId}/Context/{contextId}")
-    public void action(
+    @PostMapping("ContextList/{contextListId}/Context")
+    public void saveContextByContextListId(
             @PathVariable("contextListId") long contextListId,
-            @PathVariable("contextId") long contextId,
-            @RequestParam(name = "action") ContextListAction action
+            @RequestBody ContextDtoWriter contextDtoWriter
     ) {
-        switch (action) {
-            case ATTACH:
-                contextListService.attachToList(contextListId, contextId);
-                break;
-            case DETACH:
-                contextListService.detachFromList(contextListId, contextId);
-                break;
-        }
+        contextListService.saveContextByContextListId(contextListId,contextDtoWriter);
     }
+
+
+//    @GetMapping("ContextList/{contextListId}/Context/{contextId}")
+//    public void action(
+//            @PathVariable("contextListId") long contextListId,
+//            @PathVariable("contextId") long contextId,
+//            @RequestParam(name = "action") ContextListAction action
+//    ) {
+//        switch (action) {
+//            case ATTACH:
+//                contextListService.attachToList(contextListId, contextId);
+//                break;
+//            case DETACH:
+//                contextListService.detachFromList(contextListId, contextId);
+//                break;
+//        }
+//    }
 
     @GetMapping("ContextList/{contextListId}/Context/ContextStatus")
-    public List<ContextDto> findContextByContextListIdWithStatus(
+    public List<ContextDtoReader> findContextByContextListIdWithStatus(
             @PathVariable("contextListId") long contextListId,
             @RequestParam(name = "limit") long limit,
             @RequestParam(name = "status") List<ContextStatusType> statusTypeList

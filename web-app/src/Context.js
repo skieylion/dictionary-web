@@ -10,24 +10,36 @@ import InputLabel from '@mui/material/InputLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
 
+import { useParams } from 'react-router-dom';
 
-import JsonData from './posts.json'
+const axios=require('axios').default;
+
 
 const columns = [
-  {field: 'id', headerName: 'ID'},
-  {field: 'title', headerName: 'Title', width: 300},
-  {field: 'body', headerName: 'Body', width: 600}
+  {field: 'id',headerName: 'Id'},
+  {field: 'context', headerName: 'Context', width: 300},
+  {field: 'example', headerName: 'Example', width: 700}
 ]
 
 export default function Context() {
   const [tableData, setTableData] = useState([]);
+  const {contextId,contextListId}=useParams();
+
 
   useEffect(() => {
-    setTableData(JsonData);
-    // fetch("/posts.json")
-    //  .then((data) => data.json())
-    //  .then((data) => setTableData(data))
-  })
+    axios.get("http://localhost:8081/ContextList/"+contextListId+"/Context")
+    .then(response=>{
+      let data=[];
+      for(const d of response.data){
+        data.push({
+          id:d.id,
+          context:d.expressionValue,
+          example:d.exampleList&&d.exampleList[0]?d.exampleList[0].text:"-"
+        });
+      }
+      setTableData(data);
+    });
+  },[]);
 
   return (
     <Stack spacing={1}>
@@ -58,7 +70,6 @@ export default function Context() {
           columns={columns}
           pageSize={12}
           checkboxSelection
-          rowCount={200}
         />
       </div>
     </Stack>

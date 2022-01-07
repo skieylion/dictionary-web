@@ -3,6 +3,8 @@ package jentus.dictionary.model;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "ContextList")
@@ -22,4 +24,8 @@ public class ContextList {
     public int hashCode(){
         return (int)id;
     }
+
+    @ManyToMany(mappedBy = "contextLists")
+    private Set<Context> contexts=new HashSet<>();
+
 }

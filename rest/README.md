@@ -10,6 +10,7 @@
   - +DELETE : delete a list
 - ### +/ContextList/{id}/Context
   - #### {id} : a context list id (1,2,...N)
+  - POST : ?
   - GET : get a context list from context lists
     - params:
       - status : new, studied, repeated, unrepeated
@@ -37,8 +38,8 @@
   - +GET : get parts of speech
 - ### + /Lexeme
   - +GET : get lexemes (why ? it needs to limit)
-  - +POST : save a lexeme
-    - Lexeme : an object of a lexeme
+  - +POST : save a expression
+    - Lexeme : an object of a expression
 
 ## Objects
 - Lexeme

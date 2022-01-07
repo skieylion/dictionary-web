@@ -6,7 +6,7 @@ import jentus.dictionary.exception.ContextStatusNotSetException;
 import jentus.dictionary.model.ContextParams;
 import jentus.dictionary.model.ContextSortField;
 import jentus.dictionary.model.ContextSortType;
-import jentus.dictionary.model.dto.ContextDto;
+import jentus.dictionary.model.dto.ContextDtoReader;
 import jentus.dictionary.model.ContextStatusType;
 import jentus.dictionary.service.ContextStatusService;
 import jentus.dictionary.service.ContextService;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin("http://localhost:3000")
 @RestController
 @AllArgsConstructor
 public class ContextCtrl {
@@ -29,13 +30,14 @@ public class ContextCtrl {
     public void delete(@PathVariable("id") long id) {
         contextService.delete(id);
     }
+
     @GetMapping("/Context/{id}")
-    public ContextDto findById(@PathVariable("id") long id) throws ContextNotFoundException {
+    public ContextDtoReader findById(@PathVariable("id") long id) throws ContextNotFoundException {
         return contextService.findById(id);
     }
 
     @GetMapping("/Context")
-    public List<ContextDto> findAll(
+    public List<ContextDtoReader> findAll(
             @RequestParam(name = "limit") int limit,
             @RequestParam(name = "offset") int offset,
             @RequestParam(name = "contextListIds", required = false) List<Long> contextListIds,

@@ -2,14 +2,16 @@ package jentus.dictionary.service;
 
 import jentus.dictionary.model.ContextList;
 import jentus.dictionary.model.ContextStatusType;
-import jentus.dictionary.model.dto.ContextDto;
+import jentus.dictionary.model.dto.ContextDtoReader;
+import jentus.dictionary.model.dto.ContextDtoWriter;
+import jentus.dictionary.model.dto.ContextListDto;
 
 import java.util.List;
 
 public interface ContextListService {
     void save(ContextList contextList);
 
-    List<ContextList> findAll();
+    List<ContextListDto> findAll();
 
     void delete(long id);
 
@@ -17,5 +19,9 @@ public interface ContextListService {
 
     void detachFromList(long contextListId, long contextId);
 
-    List<ContextDto> findContextByStatusList(long contextListId, long limit, List<ContextStatusType> contextStatusTypeList);
+    void saveContextByContextListId(long contextListId, ContextDtoWriter contextDtoWriter);
+
+    List<ContextDtoReader> findContextByContextListId(long contextListId);
+
+    List<ContextDtoReader> findContextByStatusList(long contextListId, long limit, List<ContextStatusType> contextStatusTypeList);
 }

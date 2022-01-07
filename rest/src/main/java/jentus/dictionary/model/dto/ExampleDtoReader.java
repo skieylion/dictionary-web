@@ -1,10 +1,9 @@
 package jentus.dictionary.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonRootName;
 import lombok.Data;
 
 @Data
-public class ExampleDto {
+public class ExampleDtoReader {
     private Long id;
     private String text;
 }

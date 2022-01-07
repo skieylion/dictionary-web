@@ -7,6 +7,5 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface PartOfSpeechRepository extends CrudRepository<PartOfSpeech,Long> {
-    List<PartOfSpeech> findAll();
+public interface PartOfSpeechRepository extends CrudRepository<PartOfSpeech, Long> {
 }

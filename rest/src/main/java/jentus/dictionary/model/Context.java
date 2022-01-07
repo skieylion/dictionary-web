@@ -1,6 +1,5 @@
 package jentus.dictionary.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Fetch;
@@ -26,9 +25,13 @@ public class Context {
     @Column(name = "translate")
     private String translate;
 
-    @ManyToOne(targetEntity = LexemeAndPartOfSpeech.class, fetch = FetchType.EAGER)
-    @JoinColumn(name = "lexemeAndPartOfSpeechId")
-    private LexemeAndPartOfSpeech lexemeAndPartOfSpeech;
+    @ManyToOne(targetEntity = PartOfSpeech.class, fetch = FetchType.EAGER)
+    @JoinColumn(name = "partOfSpeechId")
+    private PartOfSpeech partOfSpeech;
+
+    @ManyToOne(targetEntity = Expression.class, fetch = FetchType.EAGER)
+    @JoinColumn(name = "expressionId")
+    private Expression expression;
 
     @ManyToOne(targetEntity = FileTable.class, fetch = FetchType.EAGER)
     @JoinColumn(name = "photoId")
@@ -41,5 +44,13 @@ public class Context {
     @OneToMany(targetEntity = ContextEvent.class, mappedBy = "context", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @Fetch(value = FetchMode.SUBSELECT)
     private List<ContextEvent> contextEvents;
+
+    @ManyToMany(cascade = CascadeType.ALL,targetEntity = ContextList.class,fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "ContextAndContextList",
+            joinColumns = @JoinColumn(name = "contextId"),
+            inverseJoinColumns = @JoinColumn(name = "contextListId")
+    )
+    private Set<ContextList> contextLists=new HashSet<>();
 
 }

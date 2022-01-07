@@ -1,6 +1,5 @@
 package jentus.dictionary.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,9 +18,9 @@ public class Transcription {
     private String value;
 
     //@JsonIgnoreProperties(value = {"hibernateLazyInitializer"}) //"applications",
-    @ManyToOne(targetEntity = Lexeme.class,fetch = FetchType.EAGER)
-    @JoinColumn(name = "lexemeId")
-    private Lexeme lexeme;
+    @ManyToOne(targetEntity = Expression.class,fetch = FetchType.EAGER)
+    @JoinColumn(name = "expressionId")
+    private Expression expression;
 
     @ManyToOne(targetEntity = TranscriptionVariant.class,fetch = FetchType.EAGER)
     @JoinColumn(name = "transcriptionVariantId")
