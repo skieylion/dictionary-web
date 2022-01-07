@@ -4,6 +4,7 @@ import jentus.dictionary.model.Context;
 import jentus.dictionary.model.Example;
 import jentus.dictionary.model.dto.ContextDtoReader;
 import jentus.dictionary.model.dto.ExampleDtoReader;
+import jentus.dictionary.model.dto.TranscriptionDto;
 import jentus.dictionary.service.ContextStatusService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,12 @@ public class ContextToContextDtoConverterImpl implements ContextToContextDtoConv
         });
         contextDtoReader.setExampleList(exampleDtoReaderList);
         contextDtoReader.setStatus(contextStatusService.getContextStatusDtoByContext(context));
-
+        context.getExpression().getTranscriptionSet().forEach(transcription -> {
+            TranscriptionDto transcriptionDto=new TranscriptionDto();
+            transcriptionDto.setValue(transcription.getValue());
+            transcriptionDto.setVariant(transcription.getTranscriptionVariant().getName());
+            contextDtoReader.getTranscription().add(transcriptionDto);
+        });
         contextDtoReader.setPartOfSpeech(partOfSpeechToPartOfSpeechDtoConverter.convert(context.getPartOfSpeech()));
 
         return contextDtoReader;

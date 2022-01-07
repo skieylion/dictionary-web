@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.util.UUID;
 
 @Entity
 @Table(name = "FileTable")
@@ -14,7 +15,7 @@ public class FileTable {
 
     @Id
     @Type(type="pg-uuid")
-    private String fileId;
+    private UUID fileId;
 
     @Column(name = "name")
     private String name;

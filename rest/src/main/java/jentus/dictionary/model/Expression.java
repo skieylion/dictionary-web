@@ -17,6 +17,9 @@ public class Expression {
     @Column(name = "value")
     private String value;
 
+    @OneToMany(targetEntity = Transcription.class, mappedBy = "expression",fetch = FetchType.EAGER)
+    private Set<Transcription> transcriptionSet = new HashSet<>();
+
 //    @ManyToMany(cascade = CascadeType.ALL,targetEntity = PartOfSpeech.class,fetch = FetchType.EAGER)
 //    @JoinTable(
 //            name="ExpressionAndPartOfSpeech",

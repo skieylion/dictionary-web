@@ -31,7 +31,9 @@ import Container from '@mui/material/Container';
 //import Component from ''
 import Context from './Context';
 import ContextList from './ContextList';
-import Card from './Card';
+import CardWriter from './CardWriter';
+import CardReader from './CardReader';
+import CardEditor from './CardEditor';
 
 const drawerWidth = 240;
 
@@ -175,9 +177,9 @@ export default function PersistentDrawerLeft() {
             <Route path="/context" element={<Context />} />
             <Route path="/contextlist" element={<ContextList />} />
             <Route path="/contextlist/:contextListId/context" element={<Context />} />
-            <Route path="/contextlist/:contextListId/card/writer" element={<Card role="writer" />} />
-            <Route path="/contextlist/:contextListId/card/:contextId/reader" element={<Card role="reader" />} />
-            <Route path="/contextlist/:contextListId/card/:contextId/editor" element={<Card role="editor" />} />
+            <Route path="/contextlist/:contextListId/card/writer" element={<CardWriter />} />
+            <Route path="/contextlist/:contextListId/card/:contextId/reader" element={<CardReader />} />
+            <Route path="/contextlist/:contextListId/card/:contextId/editor" element={<CardEditor />} />
           </Routes>
         </Main>
       </Box>

@@ -17,7 +17,7 @@ import { useParams } from 'react-router-dom';
 import {Link} from 'react-router-dom'
 const axios=require('axios').default;
 
-export default function Card(props) {
+export default function CardEditor(props) {
     const {contextListId,contextId}=useParams();
 
     const [partOfSpeechList, setPartOfSpeechList] = useState([]);
