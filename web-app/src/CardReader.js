@@ -120,6 +120,8 @@ export default function CardReader(props) {
                     <a target="_blank" href={"https://youglish.com/pronounce/"+contextReader.expression+"/english/uk"}>🔎 youglish</a>
                     <a target="_blank" href={"https://dictionary.cambridge.org/dictionary/english/"+contextReader.expression}>🔎 dictionary</a>
                     <a target="_blank" href={"https://translate.google.com/?sl=en&tl=ru&op=translate&text="+contextReader.expression}>🔎 translate</a>
+                    <a target="_blank" href={"https://www.google.com/search?tbm=isch&tbs=il:cl&hl=en&sa=X&q="+contextReader.expression}>🔎 images</a>
+                    
                 </Stack>
                 
                 <Stack spacing={0} fullWidth>

@@ -37,3 +37,7 @@ build/
 
 #pgdata
 /pgdata/
+
+/.localstack
+
+/backup.backup

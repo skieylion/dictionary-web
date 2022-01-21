@@ -1,4 +1,4 @@
-version: '3'
+version: '2'
 
 services:
   pgadmin:
@@ -9,16 +9,67 @@ services:
       PGADMIN_DEFAULT_EMAIL: root@root.com
       PGADMIN_DEFAULT_USER: root
       PGADMIN_DEFAULT_PASSWORD: root
+    networks:
+      skynet:
+        ipv4_address: 172.20.0.5
     depends_on:
       - db
     ports:
       - "5050:80"
     volumes:
       - pgadmin-data:/var/lib/pgadmin   
+#  web:
+#    container_name: webapp
+#    networks:
+#      skynet:
+#        ipv4_address: 172.20.0.7
+#    depends_on:
+#      - rest
+#    build: 
+#      context: ./web-app
+#      dockerfile: Dockerfile
+#    ports:
+#      - 3000:3000
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack_demo
+    networks:
+      skynet:
+        ipv4_address: 172.20.0.8
+    ports:
+      - "4566:4566" # Edge Port
+      - "4569:4569" # Dynamo DB Port
+      - "4571:4571" # Elasticsearch Port
+      - "4572:4572" # S3 Port
+      - "4574:4574" # Lambda Port
+      - "8055:8080" # Web-UI Port
+#    networks:
+#      skynet:
+#        ipv4_address: 172.20.0.7
+    environment:
+      - SERVICES=s3
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+      - PORT_WEB_UI=8055
+    volumes:
+      - './.localstack:/tmp/localstack'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+  rest:
+    depends_on:
+      - db
+      - localstack
+    build:
+      context: ./rest
+      dockerfile: Dockerfile
+    ports:
+      - 8081:8081
+    networks:
+      skynet:
+        ipv4_address: 172.20.0.4
   db:
     networks:
       skynet:
-        ipv4_address: 10.0.1.100
+        ipv4_address: 172.20.0.6
     container_name: postgresql_db
     image: postgres
     restart: always
@@ -35,9 +86,8 @@ networks:
   skynet:
     driver: bridge
     ipam:
-      driver: default
       config:
-        - subnet: 10.0.1.0/24
+        - subnet: 172.20.0.0/24
 volumes:
   db-data:
   pgadmin-data:
