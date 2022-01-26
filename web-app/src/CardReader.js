@@ -15,6 +15,8 @@ import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
 import { useParams } from 'react-router-dom';
 import {Link} from 'react-router-dom'
+import CardImage from './CardImage';
+
 const axios=require('axios').default;
 
 export default function CardReader(props) {
@@ -34,6 +36,7 @@ export default function CardReader(props) {
                 transcriptionVariant:data.transcription&&data.transcription.length>0?data.transcription[0].variant:null,
                 expression:data.expressionValue,
                 definition:data.definition,
+                photoUrl:"http://localhost:8081/File/"+data.photoId,
                 partOfSpeech:data.partOfSpeech.name,
                 exampleList:data.exampleList?data.exampleList:[]
             });
@@ -88,29 +91,7 @@ export default function CardReader(props) {
     return (
         <Stack justifyItems="center" alignItems="center">
             <Stack spacing={1} sx={{width:650}}>
-                <Stack spacing={0}>
-                    <Box
-                        sx={{
-                            width: 650,
-                            height: 360
-                            }
-                        }
-                    >
-                        <img style={{width:650,height:360}} src="https://avatars.mds.yandex.net/i?id=ed5752593d20584af46e71b0c239b7ac-5870379-images-thumbs&n=13"></img>
-                    </Box>
-                    <Box
-                        sx={{
-                            width: 650,
-                            height: 0,
-                            backgroundColor: 'primary.dark',
-                            '&:hover': {
-                            backgroundColor: 'primary.main',
-                            opacity: [0.9, 0.8, 0.7],
-                            },
-                        }}
-                    >
-                    </Box>
-                </Stack>
+                <CardImage role="reader" photoUrl={contextReader.photoUrl} />
                 <Stack spacing={0}  fullWidth>
                     <Typography variant="h4" gutterBottom spacing={0}>
                         {contextReader.expression} ({contextReader.partOfSpeech})

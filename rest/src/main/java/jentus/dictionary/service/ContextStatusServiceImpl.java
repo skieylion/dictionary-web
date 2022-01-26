@@ -22,18 +22,21 @@ public class ContextStatusServiceImpl implements ContextStatusService {
     private final ContextEventRepository contextEventRepository;
     private final ContextStatus contextStatusRepeated;
     private final ContextStatus contextStatusStudied;
+    private final ContextStatus contextStatusNew;
 
     public ContextStatusServiceImpl(
             ContextRepository contextRepository,
             ContextEventRepository contextEventRepository,
             ContextStatusRepository contextStatusRepository,
             @Value("${context.status.repeated}") long repeatedId,
-            @Value("${context.status.studied}") long studiedId
+            @Value("${context.status.studied}") long studiedId,
+            @Value("${context.status.new}") long newId
     ) throws ContextStatusNotFoundException {
         this.contextRepository = contextRepository;
         this.contextEventRepository = contextEventRepository;
         this.contextStatusRepeated = contextStatusRepository.findById(repeatedId).orElseThrow(ContextStatusNotFoundException::new);
         this.contextStatusStudied = contextStatusRepository.findById(studiedId).orElseThrow(ContextStatusNotFoundException::new);
+        this.contextStatusNew = contextStatusRepository.findById(newId).orElseThrow(ContextStatusNotFoundException::new);
     }
 
     @Override
@@ -66,6 +69,8 @@ public class ContextStatusServiceImpl implements ContextStatusService {
                 return contextStatusRepeated;
             case STUDIED:
                 return contextStatusStudied;
+            case NEW:
+                return contextStatusNew;
             default:
                 throw new ContextStatusNotFoundException();
         }

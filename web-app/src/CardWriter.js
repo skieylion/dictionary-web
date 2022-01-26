@@ -16,14 +16,22 @@ import Typography from '@mui/material/Typography';
 import { useParams } from 'react-router-dom';
 import {Link} from 'react-router-dom'
 import CardImage from './CardImage';
+import {v4 as uuidv4} from 'uuid';
+
 const axios=require('axios').default;
+
+
 
 export default function CardWriter() {
 
     const {contextListId}=useParams();
     const [partOfSpeechList, setPartOfSpeechList] = useState([]);
+    const [guid, setGuid] = useState([]);
+
+
 
     useEffect(() => {
+        setGuid(uuidv4());
         axios.get("http://localhost:8081/PartOfSpeech")
         .then(response=>{
             let data=[];
@@ -105,10 +113,10 @@ export default function CardWriter() {
         return new File([u8arr], filename, {type:mime});
     }
 
-    const saveFile=function(){
+    const saveFile=function(f){
         var imageFile=document.getElementById("pastedImage");
         console.log("imageFile",imageFile);
-        const file = dataURLtoFile(imageFile.src,'hello.txt');
+        const file = dataURLtoFile(imageFile.src,guid+'.png');
         
         console.log(file);
         //console.log("image",imageFile);
@@ -117,38 +125,50 @@ export default function CardWriter() {
         //bodyFormData.append('name', "asd");
         axios({
             method:"POST",
-            url:"http://localhost:8081/File",
+            url:"http://localhost:8081/File?fileId="+guid,
             data:bodyFormData,
             headers: { "Content-Type": "multipart/form-data" }
         }).then(response=>{
             console.log("response",response);
+            f();
         }).catch(error=>{
             console.log(error);
         });
     }
 
     const clickSaveContext=function(){
-        saveFile();
-        // let contextDto={
-        //     partOfSpeechId:partOfSpeechId,
-        //     expressionValue:expressionValue.current.value,
-        //     definition:definitionValue.current.value,
-        //     translate:translateValue.current.value,
-        //     transcription:transcriptionValue.current.value,
-        //     exampleList:[]
-        // };
+        saveFile(
+            function(){
+                let contextDto={
+                    photoId:guid,
+                    partOfSpeechId:partOfSpeechId,
+                    expressionValue:expressionValue.current.value,
+                    definition:definitionValue.current.value,
+                    translate:translateValue.current.value,
+                    transcription:transcriptionValue.current.value,
+                    exampleList:[]
+                };
 
-        // let exampleList=[...examples];
-        // for(let e of exampleList){
-        //     contextDto.exampleList.push(e.text.current.value);
-        // }
-        // console.log("contextDto",contextDto);
-        // axios.post("http://localhost:8081/ContextList/"+contextListId+"/Context",contextDto)
-        // .then(response=>{
-        //     console.log("response",response);
-        // }).catch(error=>{
-        //     console.log(error);
-        // });
+                let exampleList=[...examples];
+                for(let e of exampleList){
+                    contextDto.exampleList.push(e.text.current.value);
+                }
+                console.log("contextDto",contextDto);
+                axios.post("http://localhost:8081/ContextList/"+contextListId+"/Context",contextDto)
+                .then(response=>{
+                    console.log("response",response);
+
+                    let isLeave=window.confirm("Сохранено! Покинуть страницу ?");
+                    if(isLeave){
+                        window.history.back();
+                    } else {
+                        window.location.reload();
+                    }
+                }).catch(error=>{
+                    console.log(error);
+                });
+            }
+        );
     }
 
     const partOfSpeechOnChange=function(e){
@@ -158,10 +178,6 @@ export default function CardWriter() {
 
     return (
         <Stack justifyItems="center" alignItems="center">
-            <form action="http://localhost:8081/File"  method="post" enctype="multipart/form-data">
-                <input type="file" name="file" />
-                <input type="submit" value="upload" />
-            </form>
             <Stack spacing={1} sx={{width:650}}>
                 <Stack spacing={1} direction="row" fullWidth>
                     <TextField size="small" fullWidth  label="Выражение" id="standard-basic31" inputRef={expressionValue} variant="outlined" />

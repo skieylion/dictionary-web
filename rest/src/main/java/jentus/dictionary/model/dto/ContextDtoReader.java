@@ -16,4 +16,5 @@ public class ContextDtoReader {
     private List<ExampleDtoReader> exampleList;
     private PartOfSpeechDto partOfSpeech;
     private Set<TranscriptionDto> transcription=new HashSet<>();
+    private String photoId;
 }

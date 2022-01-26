@@ -11,9 +11,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -83,28 +85,21 @@ public class ContextListServiceImpl implements ContextListService {
             Context context = new Context();
             context.setDefinition(contextDtoWriter.getDefinition());
             context.setTranslate(contextDtoWriter.getTranslate());
+            context.setPhotoId(UUID.fromString(contextDtoWriter.getPhotoId()));
 
             partOfSpeechRepository.findById(contextDtoWriter.getPartOfSpeechId()).ifPresent(context::setPartOfSpeech);
 
             expressionRepository
                     .findByValue(contextDtoWriter.getExpressionValue())
-                    .ifPresentOrElse(expression -> {
-                        System.out.println(1);
+                    .ifPresentOrElse(context::setExpression, () -> {
+                        Expression expression = new Expression();
+                        expression.setValue(contextDtoWriter.getExpressionValue());
+                        expressionRepository.save(expression);
                         context.setExpression(expression);
-                    }, new Runnable() {
-                        @Override
-                        public void run() {
-                            System.out.println(2);
-                            Expression expression = new Expression();
-                            expression.setValue(contextDtoWriter.getExpressionValue());
-                            expressionRepository.save(expression);
-                            context.setExpression(expression);
-                        }
                     });
 
             ExpressionAndPartOfSpeech expressionAndPartOfSpeech=new ExpressionAndPartOfSpeech(context.getExpression(),context.getPartOfSpeech());
             expressionAndPartOfSpeechRepository.save(expressionAndPartOfSpeech);
-
 
             context.setExamples(new ArrayList<>());
             contextDtoWriter.getExampleList().forEach(str -> {

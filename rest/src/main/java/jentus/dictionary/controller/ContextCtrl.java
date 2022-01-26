@@ -23,9 +23,10 @@ public class ContextCtrl {
     private final ContextService contextService;
 
     @PostMapping("/Context/{id}/ContextStatus/{status}")
-    public void setStatus(@PathVariable("id") long contextId, @PathVariable("status") String status) throws ContextStatusNotSetException, ContextStatusNotFoundException {
-        contextStatusService.setStatus(contextId, ContextStatusType.valueOf(status));
+    public void setStatus(@PathVariable("id") long contextId, @PathVariable("status") ContextStatusType status) throws ContextStatusNotSetException, ContextStatusNotFoundException {
+        contextStatusService.setStatus(contextId, status);
     }
+
     @DeleteMapping("/Context/{id}")
     public void delete(@PathVariable("id") long id) {
         contextService.delete(id);

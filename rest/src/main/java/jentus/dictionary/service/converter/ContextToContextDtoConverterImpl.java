@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -26,6 +27,12 @@ public class ContextToContextDtoConverterImpl implements ContextToContextDtoConv
         contextDtoReader.setExpressionValue(context.getExpression().getValue());
         contextDtoReader.setTranslate(context.getTranslate());
         contextDtoReader.setDefinition(context.getDefinition());
+        UUID photoId = context.getPhotoId();
+        if (photoId != null) {
+            contextDtoReader.setPhotoId(photoId.toString());
+        }
+
+
         List<ExampleDtoReader> exampleDtoReaderList = new ArrayList<>();
         List<Example> exampleList = context.getExamples();
         exampleList = exampleList != null ? exampleList : new ArrayList<>();

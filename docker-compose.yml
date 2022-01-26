@@ -31,7 +31,7 @@ services:
 #    ports:
 #      - 3000:3000
   localstack:
-    image: localstack/localstack:latest
+    image: localstack/localstack-full:latest
     container_name: localstack_demo
     networks:
       skynet:
@@ -42,7 +42,7 @@ services:
       - "4571:4571" # Elasticsearch Port
       - "4572:4572" # S3 Port
       - "4574:4574" # Lambda Port
-      - "8055:8080" # Web-UI Port
+      - "8080:8080" # Web-UI Port
 #    networks:
 #      skynet:
 #        ipv4_address: 172.20.0.7
@@ -50,7 +50,7 @@ services:
       - SERVICES=s3
       - DEBUG=1
       - DATA_DIR=/tmp/localstack/data
-      - PORT_WEB_UI=8055
+      - PORT_WEB_UI=8080
     volumes:
       - './.localstack:/tmp/localstack'
       - '/var/run/docker.sock:/var/run/docker.sock'

@@ -4,11 +4,13 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "Context")
@@ -33,9 +35,9 @@ public class Context {
     @JoinColumn(name = "expressionId")
     private Expression expression;
 
-    @ManyToOne(targetEntity = FileTable.class, fetch = FetchType.EAGER)
-    @JoinColumn(name = "photoId")
-    private FileTable photoFile;
+    @Column(name = "photoId")
+    @Type(type="pg-uuid")
+    private UUID photoId;
 
     @OneToMany(targetEntity = Example.class,mappedBy = "context", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @Fetch(value = FetchMode.SUBSELECT)

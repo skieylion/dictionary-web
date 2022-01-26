@@ -16,14 +16,46 @@ const axios=require('axios').default;
 
 
 const columns = [
-  {field: 'id',headerName: 'Id'},
-  {field: 'context', headerName: 'Context', width: 300},
+  {field: 'id',headerName: 'Id',hide: true},
+  {field: 'context', headerName: 'Context', width: 150},
+  {field: 'status', headerName: 'Status', width: 150},
   {field: 'example', headerName: 'Example', width: 700}
 ]
 
 export default function Context() {
   const [tableData, setTableData] = useState([]);
   const {contextId,contextListId}=useParams();
+  const [selectRows, setSelectRows] = useState([]);
+  
+  const clickStudied=function(){
+    let recursive=function(index){
+      if(index<selectRows.length){
+        axios.post("http://localhost:8081/Context/"+selectRows[index]+"/ContextStatus/STUDIED")
+        .then(response=>{
+          recursive(++index);
+        });
+      } else {
+        alert("Выбранные выражения отмечены как выученные");
+        window.location.reload();
+      }
+    }
+    recursive(0);
+    
+  }
+  const clickNew=function(){
+    let recursive=function(index){
+      if(index<selectRows.length){
+        axios.post("http://localhost:8081/Context/"+selectRows[index]+"/ContextStatus/NEW")
+        .then(response=>{
+          recursive(++index);
+        });
+      } else {
+        alert("Выбранные выражения отмечены как новые");
+        window.location.reload();
+      }
+    }
+    recursive(0);
+  }
 
 
   useEffect(() => {
@@ -34,7 +66,8 @@ export default function Context() {
         data.push({
           id:d.id,
           context:d.expressionValue,
-          example:d.exampleList&&d.exampleList[0]?d.exampleList[0].text:"-"
+          example:d.exampleList&&d.exampleList[0]?d.exampleList[0].text:"-",
+          status:d.status.contextStatusType
         });
       }
       setTableData(data);
@@ -60,9 +93,9 @@ export default function Context() {
         <Button  variant="contained">Добавить</Button>
         <Button variant="contained">Редактировать</Button>
         <Button variant="contained">Открепить</Button>
-        <Button  variant="contained">Уже знаю</Button>
+        <Button  variant="contained" onClick={clickStudied} >Уже знаю</Button>
         <Button  variant="contained">Добавить к списку</Button>
-        <Button  variant="contained">Сбросить прогресс</Button>
+        <Button  variant="contained" onClick={clickNew} >Сбросить прогресс</Button>
       </Stack>
       <div style={{ height: 700, width: '100%' }}>
         <DataGrid 
@@ -70,6 +103,10 @@ export default function Context() {
           columns={columns}
           pageSize={12}
           checkboxSelection
+          onSelectionModelChange={(newSelectionModel) => {
+            setSelectRows(newSelectionModel);
+            console.log("sl",newSelectionModel);
+          }}
         />
       </div>
     </Stack>
