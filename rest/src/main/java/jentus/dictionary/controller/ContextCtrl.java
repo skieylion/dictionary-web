@@ -39,22 +39,9 @@ public class ContextCtrl {
 
     @GetMapping("/Context")
     public List<ContextDtoReader> findAll(
-            @RequestParam(name = "limit") int limit,
-            @RequestParam(name = "offset") int offset,
-            @RequestParam(name = "contextListIds", required = false) List<Long> contextListIds,
-            @RequestParam(name = "isUnionAll",required = false,defaultValue = "false") boolean isUnionAll,
-            @RequestParam(name = "sortByField", required = false) ContextSortField sortByField,
-            @RequestParam(name = "sortByOrder", required = false) ContextSortType sortByOrder
+            @RequestParam(name = "query") String query
     ) {
-        ContextParams contextParams=new ContextParams();
-        contextParams.setLimit(limit);
-        contextParams.setOffset(offset);
-        contextParams.setContextListIds(contextListIds);
-        contextParams.setUnionAll(isUnionAll);
-        contextParams.setContextSortField(sortByField);
-        contextParams.setContextSortType(sortByOrder);
-
-        return contextService.findByParams(contextParams);
+        return contextService.findContext(query);
     }
 
 

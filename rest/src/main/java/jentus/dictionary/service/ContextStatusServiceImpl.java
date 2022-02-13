@@ -79,15 +79,15 @@ public class ContextStatusServiceImpl implements ContextStatusService {
     @Override
     public ContextStatusDto getContextStatusDtoByContext(Context context) {
         List<ContextEvent> contextEventList = context.getContextEvents();
-        int size=contextEventList!=null?contextEventList.size():0;
-        if(size==0) return new ContextStatusDto(ContextStatusType.NEW,0,ContextTimeUnit.NONE);
+        int size = contextEventList != null ? contextEventList.size() : 0;
+        if (size == 0) return new ContextStatusDto(ContextStatusType.NEW, 0, ContextTimeUnit.NONE);
 
         List<Date> dateList = new ArrayList<>();
         for (ContextEvent contextEvent : contextEventList) {
             if (contextEvent.getContextStatus().getId() == contextStatusRepeated.getId()) {
                 dateList.add(contextEvent.getEventDate());
             } else if (contextEvent.getContextStatus().getId() == contextStatusStudied.getId()) {
-                return new ContextStatusDto(ContextStatusType.STUDIED,0, ContextTimeUnit.NONE);
+                return new ContextStatusDto(ContextStatusType.STUDIED, 0, ContextTimeUnit.NONE);
             }
         }
 
@@ -99,40 +99,42 @@ public class ContextStatusServiceImpl implements ContextStatusService {
         Date current = new Date();
         double offset = size > 0 ? (double) (current.getTime() - last.getTime()) / 1000 / 60 : 0;
 
+        ContextStatusType status = ContextStatusType.UNREPEATED;
+
         switch (size) {
             case 0:
-                return new ContextStatusDto(ContextStatusType.NEW,0,ContextTimeUnit.NONE);
+                return new ContextStatusDto(ContextStatusType.NEW, 0, ContextTimeUnit.NONE);
             case 1:
+
                 if (offset < 30) {
-                    return new ContextStatusDto(ContextStatusType.REPEATED,Math.ceil(30 - offset),ContextTimeUnit.MIN);
+                    status = ContextStatusType.REPEATED;
                 }
-                break;
+                return new ContextStatusDto(status, Math.ceil(30 - offset), ContextTimeUnit.MIN);
+
             case 2:
                 offset = offset / 60;
                 if (offset < 24) {
-                    return new ContextStatusDto(ContextStatusType.REPEATED,Math.ceil(24 - offset),ContextTimeUnit.HOUR);
+                    status = ContextStatusType.REPEATED;
                 }
-                break;
+                return new ContextStatusDto(status, Math.ceil(24 - offset), ContextTimeUnit.HOUR);
+
             case 3:
                 offset = offset / 60;
                 var week3 = 24 * 7 * 3;
                 if (offset < week3) {
-                    return new ContextStatusDto(ContextStatusType.REPEATED,Math.ceil((week3 - offset) / 24),ContextTimeUnit.DAY);
+                    status = ContextStatusType.REPEATED;
                 }
-                break;
+                return new ContextStatusDto(status, Math.ceil((week3 - offset) / 24), ContextTimeUnit.DAY);
             case 4:
                 offset = offset / 60;
                 var month3 = 24 * 7 * 4 * 3;
                 if (offset < month3) {
-                    return new ContextStatusDto(ContextStatusType.REPEATED,Math.ceil((month3 - offset) / 24),ContextTimeUnit.DAY);
+                    status = ContextStatusType.REPEATED;
                 }
-                break;
+                return new ContextStatusDto(status, Math.ceil((month3 - offset) / 24), ContextTimeUnit.DAY);
             default:
-                return new ContextStatusDto(ContextStatusType.STUDIED,0, ContextTimeUnit.NONE);
+                return new ContextStatusDto(ContextStatusType.STUDIED, 0, ContextTimeUnit.NONE);
         }
-
-
-        return null;
     }
 
 }

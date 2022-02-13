@@ -29,6 +29,7 @@ public class ContextListServiceImpl implements ContextListService {
     private final ExpressionRepository expressionRepository;
     private final PartOfSpeechRepository partOfSpeechRepository;
     private final ExpressionAndPartOfSpeechRepository expressionAndPartOfSpeechRepository;
+    private final ContextStatusService contextStatusService;
 
 
     @Override
@@ -98,12 +99,12 @@ public class ContextListServiceImpl implements ContextListService {
                         context.setExpression(expression);
                     });
 
-            ExpressionAndPartOfSpeech expressionAndPartOfSpeech=new ExpressionAndPartOfSpeech(context.getExpression(),context.getPartOfSpeech());
+            ExpressionAndPartOfSpeech expressionAndPartOfSpeech = new ExpressionAndPartOfSpeech(context.getExpression(), context.getPartOfSpeech());
             expressionAndPartOfSpeechRepository.save(expressionAndPartOfSpeech);
 
             context.setExamples(new ArrayList<>());
             contextDtoWriter.getExampleList().forEach(str -> {
-                Example example=new Example();
+                Example example = new Example();
                 example.setContext(context);
                 example.setText(str);
                 context.getExamples().add(example);
@@ -118,11 +119,18 @@ public class ContextListServiceImpl implements ContextListService {
     }
 
     @Override
-    public List<ContextDtoReader> findContextByContextListId(long contextListId) {
+    public List<ContextDtoReader> findContextByContextListIdAndStatus(long contextListId, ContextStatusType status) {
         List<ContextDtoReader> contextDtoReaderList = new ArrayList<>();
         contextListRepository.findById(contextListId).ifPresent(contextList -> {
             contextList.getContexts().forEach(context -> {
-                contextDtoReaderList.add(contextToContextDtoConverter.convert(context));
+                if (status != null && status != ContextStatusType.ANY) {
+                    var currentStatus = contextStatusService.getContextStatusDtoByContext(context).getContextStatusType();
+                    if (status.equals(currentStatus)) {
+                        contextDtoReaderList.add(contextToContextDtoConverter.convert(context));
+                    }
+                } else {
+                    contextDtoReaderList.add(contextToContextDtoConverter.convert(context));
+                }
             });
         });
         return contextDtoReaderList;

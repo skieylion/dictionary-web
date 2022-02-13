@@ -20,7 +20,18 @@ import CardImage from './CardImage';
 const axios=require('axios').default;
 
 export default function CardReader(props) {
-    const {contextListId,contextId}=useParams();
+
+    let {contextListId,contextId}=useParams();
+
+    if(props.contextId) {
+        contextId=props.contextId;
+    }
+    if(props.contextListId){
+        contextListId=props.contextListId;
+    }
+    
+
+
 
     const [partOfSpeechList, setPartOfSpeechList] = useState([]);
 

@@ -9,6 +9,9 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 import { useParams } from 'react-router-dom';
 
@@ -17,15 +20,22 @@ const axios=require('axios').default;
 
 const columns = [
   {field: 'id',headerName: 'Id',hide: true},
-  {field: 'context', headerName: 'Context', width: 150},
-  {field: 'status', headerName: 'Status', width: 150},
-  {field: 'example', headerName: 'Example', width: 700}
+  {field: 'context', headerName: 'Выражение', width: 200},
+  {field: 'example', headerName: 'Пример', width: 600},
+  {field: 'definition', headerName: 'Определение', width: 600},
+  {field: 'status', headerName: 'Статус'}
 ]
 
 export default function Context() {
   const [tableData, setTableData] = useState([]);
   const {contextId,contextListId}=useParams();
   const [selectRows, setSelectRows] = useState([]);
+
+  const [source, setSource] = React.useState('dictionary');
+
+  const sourceChange = (event) => {
+    setSource(event.target.value);
+  };
   
   const clickStudied=function(){
     let recursive=function(index){
@@ -67,7 +77,8 @@ export default function Context() {
           id:d.id,
           context:d.expressionValue,
           example:d.exampleList&&d.exampleList[0]?d.exampleList[0].text:"-",
-          status:d.status.contextStatusType
+          status:d.status.contextStatusType,
+          definition:d.definition
         });
       }
       setTableData(data);
@@ -89,14 +100,26 @@ export default function Context() {
         </FormControl>
         <Button variant="contained">Искать</Button>
       </Stack>
-      <Stack spacing={2} direction="row">
+      <Stack>
+        <RadioGroup
+          row
+          aria-labelledby="demo-row-radio-buttons-group-label"
+          name="row-radio-buttons-group"
+          value={source}
+          onChange={sourceChange}
+        >
+          <FormControlLabel value="dictionary" control={<Radio />} label="Словарь" />
+          <FormControlLabel value="mycollections" control={<Radio />} label="Мои коллекции" />
+        </RadioGroup>
+      </Stack>
+      {/* <Stack spacing={2} direction="row">
         <Button  variant="contained">Добавить</Button>
         <Button variant="contained">Редактировать</Button>
         <Button variant="contained">Открепить</Button>
         <Button  variant="contained" onClick={clickStudied} >Уже знаю</Button>
         <Button  variant="contained">Добавить к списку</Button>
         <Button  variant="contained" onClick={clickNew} >Сбросить прогресс</Button>
-      </Stack>
+      </Stack> */}
       <div style={{ height: 700, width: '100%' }}>
         <DataGrid 
           rows={tableData}

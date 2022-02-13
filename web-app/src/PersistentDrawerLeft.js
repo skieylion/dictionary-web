@@ -19,6 +19,17 @@ import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 
+import ListSubheader from '@mui/material/ListSubheader';
+import ListItemButton from '@mui/material/ListItemButton';
+import Collapse from '@mui/material/Collapse';
+//import InboxIcon from '@mui/icons-material/MoveToInbox';
+import DraftsIcon from '@mui/icons-material/Drafts';
+import SendIcon from '@mui/icons-material/Send';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import StarBorder from '@mui/icons-material/StarBorder';
+
+
 import {
   BrowserRouter as Router,
   Routes,
@@ -34,6 +45,7 @@ import ContextList from './ContextList';
 import CardWriter from './CardWriter';
 import CardReader from './CardReader';
 import CardEditor from './CardEditor';
+import Student from './Student';
 
 const drawerWidth = 240;
 
@@ -84,6 +96,16 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 function PersistentDrawerLeftList() {
 
+  const [open, setOpen] = React.useState(true);
+  const [open2, setOpen2] = React.useState(true);
+
+  const handleClick = () => {
+    setOpen(!open);
+  };
+  const handleClick2 = () => {
+    setOpen2(!open2);
+  };
+
   let state=0;
 
   const clickListItem=(index)=>{
@@ -91,17 +113,57 @@ function PersistentDrawerLeftList() {
   }
 
   return (
-    <List>
-      <ListItem button key={"Context"}>
-        <Link to="/context">
-          <ListItemText primary={"Контекст"} />
+    <List
+      sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
+      component="nav"
+      aria-labelledby="nested-list-subheader"
+    >
+      <ListItemButton onClick={handleClick2}>
+        <ListItemText primary="Контекст" />
+        {open2 ? <ExpandLess /> : <ExpandMore />}
+      </ListItemButton>
+      <Collapse in={open2} timeout="auto" unmountOnExit>
+        <List component="div" disablePadding>
+          <ListItemButton sx={{ pl: 4 }}>
+            <Link to="/context/search">
+              <ListItemText primary="Поиск" />
+            </Link>
+          </ListItemButton>
+          <ListItemButton sx={{ pl: 4 }}>
+            <Link to="/context/new">
+              <ListItemText primary="Новый" />
+            </Link>
+          </ListItemButton>
+        </List>
+      </Collapse>
+      <ListItemButton onClick={handleClick}>
+        <ListItemText primary="Коллекции" />
+        {open ? <ExpandLess /> : <ExpandMore />}
+      </ListItemButton>
+      <Collapse in={open} timeout="auto" unmountOnExit>
+        <List component="div" disablePadding>
+          <ListItemButton sx={{ pl: 4 }}>
+            <Link to="/collection/my">
+              <ListItemText primary="Мои" />
+            </Link>
+          </ListItemButton>
+          <ListItemButton sx={{ pl: 4 }}>
+            <Link to="/collection/std">
+              <ListItemText primary="Стандартные" />
+            </Link>
+          </ListItemButton>
+        </List>
+      </Collapse>
+      <ListItemButton>
+        <Link to="/task">
+          <ListItemText primary="Упражнения" />
         </Link>
-      </ListItem>
-      <ListItem button key={"List"}>
-        <Link to="/contextlist">
-          <ListItemText primary={"Списки"} />
+      </ListItemButton>
+      <ListItemButton>
+        <Link to="/correction">
+          <ListItemText primary="Корректировки" />
         </Link>
-      </ListItem>
+      </ListItemButton>
     </List>
   );
 }
@@ -160,7 +222,7 @@ export default function PersistentDrawerLeft() {
           <Divider />
           <PersistentDrawerLeftList />
           <Divider />
-          <List>
+          {/* <List>
             {['Статистика', '?', '?'].map((text, index) => (
               <ListItem button key={text}>
                 <ListItemIcon>
@@ -169,17 +231,19 @@ export default function PersistentDrawerLeft() {
                 <ListItemText primary={text} />
               </ListItem>
             ))}
-          </List>
+          </List> */}
         </Drawer>
         <Main open={open}>
           <DrawerHeader />
           <Routes>
-            <Route path="/context" element={<Context />} />
-            <Route path="/contextlist" element={<ContextList />} />
+            <Route path="/context/search" element={<Context />} />
+            <Route path="/collection/my" element={<ContextList />} />
             <Route path="/contextlist/:contextListId/context" element={<Context />} />
             <Route path="/contextlist/:contextListId/card/writer" element={<CardWriter />} />
             <Route path="/contextlist/:contextListId/card/:contextId/reader" element={<CardReader />} />
             <Route path="/contextlist/:contextListId/card/:contextId/editor" element={<CardEditor />} />
+            <Route path="/contextlist/:contextListId/student" element={<Student />} />
+
           </Routes>
         </Main>
       </Box>

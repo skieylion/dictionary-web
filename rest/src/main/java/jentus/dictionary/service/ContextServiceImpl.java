@@ -60,8 +60,14 @@ public class ContextServiceImpl implements ContextService {
         return contextDtoReaderList;
     }
 
-
-
+    @Override
+    public List<ContextDtoReader> findContext(String query) {
+        List<ContextDtoReader> contextDtoReaderList=new ArrayList<>();
+        contextRepository.findContext(query).ifPresent(context -> {
+            contextDtoReaderList.add(contextToContextDtoConverter.convert(context));
+        });
+        return contextDtoReaderList;
+    }
 
 
 }

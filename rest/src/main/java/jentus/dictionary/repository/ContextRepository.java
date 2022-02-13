@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ContextRepository extends CrudRepository<Context,Long>, ContextRepositoryCustom {
@@ -17,4 +18,7 @@ public interface ContextRepository extends CrudRepository<Context,Long>, Context
 
     @Query("select ctx from Context ctx where id in :listId")
     List<Context> findAllByListId(@Param("listId") List<Long> listId);
+
+    @Query("select ctx from context ctx left join expression ex on ctx.expressionId=ex.id where ex.value=:query")
+    Optional<Context> findContext(@Param("query") String query);
 }

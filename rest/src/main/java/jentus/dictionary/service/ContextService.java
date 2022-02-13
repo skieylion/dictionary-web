@@ -12,4 +12,5 @@ public interface ContextService {
     ContextDtoReader findById(long id) throws ContextNotFoundException;
     void delete(long id);
     List<ContextDtoReader> findByParams(ContextParams contextParams);
+    List<ContextDtoReader> findContext(String query);
 }

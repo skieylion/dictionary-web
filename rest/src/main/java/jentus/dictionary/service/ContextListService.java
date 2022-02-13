@@ -21,7 +21,7 @@ public interface ContextListService {
 
     void saveContextByContextListId(long contextListId, ContextDtoWriter contextDtoWriter);
 
-    List<ContextDtoReader> findContextByContextListId(long contextListId);
+    List<ContextDtoReader> findContextByContextListIdAndStatus(long contextListId,ContextStatusType status);
 
     List<ContextDtoReader> findContextByStatusList(long contextListId, long limit, List<ContextStatusType> contextStatusTypeList);
 }

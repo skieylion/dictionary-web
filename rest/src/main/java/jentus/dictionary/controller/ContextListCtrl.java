@@ -69,9 +69,12 @@ public class ContextListCtrl {
         return contextService.findByParams(contextParams);
     }
 
-    @GetMapping("ContextList/{id}/Context")
-    public List<ContextDtoReader> findContextByContextListId(@PathVariable("id") long id) {
-        return contextListService.findContextByContextListId(id);
+    @GetMapping("ContextList/{contextListId}/Context")
+    public List<ContextDtoReader> findContextByContextListId(
+            @PathVariable("contextListId") long contextListId,
+            @RequestParam(value = "status",required = false) ContextStatusType status
+    ) {
+        return contextListService.findContextByContextListIdAndStatus(contextListId,status);
     }
 
     @PostMapping("ContextList/{contextListId}/Context")
