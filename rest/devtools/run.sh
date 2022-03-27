@@ -1,1 +1,0 @@
-docker run -p 8081:8081  --name myapp -it myapp:1-SNAPSHOT
