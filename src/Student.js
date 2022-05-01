@@ -131,7 +131,7 @@ export default function Student(props) {
 
                 let e=()=>{
                     alert("the end");
-                    window.location="/ContextList";
+                    window.location="/collection/my";
                 };
 
                 let rec=(z)=>{

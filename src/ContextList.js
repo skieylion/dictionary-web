@@ -147,7 +147,7 @@ export default class ContextList extends Component{
                             <Stack spacing={2} direction="row" hidden>
                               <Button variant="contained" component={Link} to={"/ContextList/"+cl.id+"/Context"}>Просмотр</Button>
                               <Button variant="contained" onClick={function(){clickEdit(cl)}}>Редактировать</Button>
-                              <Button variant="contained">Изучать</Button>
+                              <Button variant="contained" component={Link} to={"/ContextList/"+cl.id+"/Student"} >Изучать</Button>
                             </Stack>
                         }
                         
