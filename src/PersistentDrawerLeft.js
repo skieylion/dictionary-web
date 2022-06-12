@@ -46,6 +46,7 @@ import CardWriter from './CardWriter';
 import CardReader from './CardReader';
 import CardEditor from './CardEditor';
 import Student from './Student';
+import Audio from './Audio';
 
 const drawerWidth = 240;
 
@@ -164,6 +165,11 @@ function PersistentDrawerLeftList() {
           <ListItemText primary="Корректировки" />
         </Link>
       </ListItemButton>
+      <ListItemButton>
+        <Link to="/listening">
+          <ListItemText primary="Аудирование" />
+        </Link>
+      </ListItemButton>
     </List>
   );
 }
@@ -243,6 +249,7 @@ export default function PersistentDrawerLeft() {
             <Route path="/contextlist/:contextListId/card/:contextId/reader" element={<CardReader />} />
             <Route path="/contextlist/:contextListId/card/:contextId/editor" element={<CardEditor />} />
             <Route path="/contextlist/:contextListId/student" element={<Student />} />
+            <Route path="/listening" element={<Audio />} />
 
           </Routes>
         </Main>
