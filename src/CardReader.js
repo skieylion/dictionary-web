@@ -21,84 +21,31 @@ const axios=require('axios').default;
 
 export default function CardReader(props) {
 
-    let {contextListId,contextId}=useParams();
+    let {cardId}=useParams();
 
-    if(props.contextId) {
-        contextId=props.contextId;
+    if(props.cardId) {
+        cardId=props.cardId;
     }
-    if(props.contextListId){
-        contextListId=props.contextListId;
-    }
-    
-
-
-
-    const [partOfSpeechList, setPartOfSpeechList] = useState([]);
 
     const [contextReader,setContextReader] = useState({});
 
     useEffect(() => {   
-        axios.get("http://localhost:8081/ContextList/"+contextListId+"/Context/"+contextId)
+        axios.get("http://localhost:8081/cards/"+cardId)
         .then(response=>{
             console.log("context",response);
             let data=response.data;
             setContextReader({
-                transcriptionValue:data.transcription&&data.transcription.length>0?data.transcription[0].value:null,
-                transcriptionVariant:data.transcription&&data.transcription.length>0?data.transcription[0].variant:null,
-                expression:data.expressionValue,
-                definition:data.definition,
-                photoUrl:"http://localhost:8081/File/"+data.photoId,
-                partOfSpeech:data.partOfSpeech.name,
-                exampleList:data.exampleList?data.exampleList:[]
+                transcriptionValue: data.transcriptions&&data.transcriptions.length>0?data.transcriptions[0].value:null,
+                transcriptionVariant: data.transcriptions&&data.transcriptions.length>0?data.transcriptions[0].variant:null,
+                expression: data.expression,
+                definition: data.definition,
+                photoUrl: data.photoId!=null?"http://localhost:8082/Files/"+data.photoId:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Test-Logo.svg/783px-Test-Logo.svg.png",
+                partOfSpeech: data.partOfSpeech.name,
+                exampleList: data.examples?data.examples:[]
             });
         });
     },[]);
     
-    const [keyIndex,setKeyIndex]=React.useState(3);
-
-    
-    
-    const [examples,setExamples]=React.useState([
-        {
-            key:1,
-            text:React.useRef('')
-            
-        }
-    ]);
-
-    const [partOfSpeechId,setPartOfSpeechId]=React.useState(-1);
-
-    const expressionValue=React.useRef('');
-    const transcriptionValue=React.useRef('');
-    const definitionValue=React.useRef('');
-    const translateValue=React.useRef('');
-    const buffer=React.useRef('');
-
-    const clickSaveContext=function(){
-        
-        let contextDto={
-            partOfSpeechId:partOfSpeechId,
-            expressionValue:expressionValue.current.value,
-            definition:definitionValue.current.value,
-            translate:translateValue.current.value,
-            transcription:transcriptionValue.current.value,
-            exampleList:[]
-        };
-
-        let exampleList=[...examples];
-        for(let e of exampleList){
-            contextDto.exampleList.push(e.text.current.value);
-        }
-        console.log("contextDto",contextDto);
-        axios.post("http://localhost:8081/ContextList/"+contextListId+"/Context",contextDto)
-        .then(response=>{
-            console.log("response",response);
-        }).catch(error=>{
-            console.log(error);
-        });
-    }
-
-
     return (
         <Stack justifyItems="center" alignItems="center">
             <Stack spacing={1} sx={{width:650}}>

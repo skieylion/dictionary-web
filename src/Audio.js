@@ -21,7 +21,7 @@ import TextField from '@mui/material/TextField';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
-
+import TextareaAutosize from '@mui/material/TextareaAutosize';
 const WallPaper = styled('div')({
   position: 'absolute',
   width: '100%',
@@ -98,6 +98,7 @@ export default function Audio() {
   //const duration = 200; // seconds
   const [duration, setDuration] = React.useState(1);
   const [position, setPosition] = React.useState(0);
+  const [stepBack, setStepBack] = React.useState(5);
   const [paused, setPaused] = React.useState(true);
   function formatDuration(value) {
     const minute = Math.floor(value / 60);
@@ -128,6 +129,9 @@ export default function Audio() {
   }
   function setCurrentTime(value){
     getMedia().currentTime=value;
+  }
+  function setRate(v) {
+    getMedia().playbackRate = v;
   }
 
   function getBase64(file,f) {
@@ -270,17 +274,17 @@ export default function Audio() {
             mt: -1,
           }}
         >
-          <IconButton aria-label="previous song">
+          <IconButton aria-label="previous song" 
+            onClick={() => {
+                const media=getMedia();
+                setCurrentTime(getCurrentTime()-stepBack);
+                setPosition(getCurrentTime());
+            }}
+          >
             <ReplayIcon fontSize="large" htmlColor={mainIconColor} />
           </IconButton>
-          <TextField
-                id="outlined-number"
-                label="repeat"
-                size="small"
-                type="number"
-                inputProps={{ min: 5, max: 15, step: 5, defaultValue: 5 }}
-            />
-            <FormControlLabel control={<Checkbox defaultChecked />} label="stop" sx={{ml: +0}} />
+          
+            
           <IconButton
             aria-label={paused ? 'play' : 'pause'}
             onClick={() => {
@@ -303,29 +307,60 @@ export default function Audio() {
               <PauseRounded sx={{ fontSize: '3rem' }} htmlColor={mainIconColor} />
             )}
           </IconButton>
+            
+            
+
+            
+        </Box>
+        
+        
+        <Stack direction="row">
+          <TextField
+                id="outlined-number"
+                label="back"
+                size="small"
+                type="number"
+                onChange={(e)=>{
+                  console.log("stepback")
+                  console.log(e.target.value);
+                  setStepBack(e.target.value);
+                
+                }}
+
+                inputProps={{ min: 0, max: 15, step: 5, defaultValue: 2 }}
+          />
+            <FormControlLabel control={<Checkbox defaultChecked />} label="stopping" sx={{ml: +0}}  />
+            <FormControlLabel control={<Checkbox defaultChecked />} label="repeating" />
             <TextField
                 id="outlined-number"
                 label="speed"
                 size="small"
                 type="number"
-                inputProps={{ min: 0.25, max: 1, step: 0.25, defaultValue: 1 }}
+                inputProps={{ min: 0.5, max: 1, step: 0.25, defaultValue: 1 }}
+                onChange={(e)=>{
+                  console.log("speed")
+                  console.log(e.target.value);
+                  setRate(e.target.value);
+                
+                }}
             />
-            
-
-            <Stack spacing={1} direction="row"  alignItems="center" width={170} >
-                <VolumeDownRounded sx={{ ml: +3 }}   />
-                <Slider
-                    aria-label="Volume"
-                    defaultValue={100}
-                />
-                <VolumeUpRounded />
-            </Stack>
-        </Box>
-        
-        
-            
+        </Stack>
+        <Stack sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }} >
+      <TextareaAutosize
+        aria-label="minimum height"
+        minRows={15}
+      
+        style={{ width: 1500 }}
+      />
+      </Stack>
       </Widget>
+      
       <WallPaper />
+      
     </Box>
   );
 }

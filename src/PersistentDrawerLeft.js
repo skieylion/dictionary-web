@@ -47,6 +47,8 @@ import CardReader from './CardReader';
 import CardEditor from './CardEditor';
 import Student from './Student';
 import Audio from './Audio';
+import ListSlotCard from './ListSlotCard';
+import ListCardMini from './ListCardMini';
 
 const drawerWidth = 240;
 
@@ -95,10 +97,13 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   justifyContent: 'flex-end',
 }));
 
+
+
 function PersistentDrawerLeftList() {
 
   const [open, setOpen] = React.useState(true);
   const [open2, setOpen2] = React.useState(true);
+  
 
   const handleClick = () => {
     setOpen(!open);
@@ -119,7 +124,7 @@ function PersistentDrawerLeftList() {
       component="nav"
       aria-labelledby="nested-list-subheader"
     >
-      <ListItemButton onClick={handleClick2}>
+      {/* <ListItemButton onClick={handleClick2}>
         <ListItemText primary="Контекст" />
         {open2 ? <ExpandLess /> : <ExpandMore />}
       </ListItemButton>
@@ -154,17 +159,22 @@ function PersistentDrawerLeftList() {
             </Link>
           </ListItemButton>
         </List>
-      </Collapse>
+      </Collapse> */}
       <ListItemButton>
-        <Link to="/task">
-          <ListItemText primary="Упражнения" />
+        <Link to="/writer">
+          <ListItemText primary="new" />
         </Link>
       </ListItemButton>
       <ListItemButton>
+        <Link to="/slots">
+          <ListItemText primary="slots" />
+        </Link>
+      </ListItemButton>
+      {/* <ListItemButton>
         <Link to="/correction">
           <ListItemText primary="Корректировки" />
         </Link>
-      </ListItemButton>
+      </ListItemButton> */}
       <ListItemButton>
         <Link to="/listening">
           <ListItemText primary="Аудирование" />
@@ -186,6 +196,7 @@ export default function PersistentDrawerLeft() {
   const handleDrawerClose = () => {
     setOpen(false);
   };
+  
 
   return (
     <Router>
@@ -242,13 +253,16 @@ export default function PersistentDrawerLeft() {
         <Main open={open}>
           <DrawerHeader />
           <Routes>
+            <Route path="/slots" element={<ListSlotCard />} />
+            <Route path="/slots/:slotId/cards" element={<ListCardMini />} />
+            <Route path="/writer" element={<CardWriter />} />
             <Route path="/context/search" element={<Context />} />
-            <Route path="/collection/my" element={<ContextList />} />
+            <Route path="/cards" element={<ContextList />} />
             <Route path="/contextlist/:contextListId/context" element={<Context />} />
             <Route path="/contextlist/:contextListId/card/writer" element={<CardWriter />} />
-            <Route path="/contextlist/:contextListId/card/:contextId/reader" element={<CardReader />} />
+            <Route path="/cards/:cardId/reader" element={<CardReader />} />
             <Route path="/contextlist/:contextListId/card/:contextId/editor" element={<CardEditor />} />
-            <Route path="/contextlist/:contextListId/student" element={<Student />} />
+            <Route path="/slots/:contextListId/student" element={<Student />} />
             <Route path="/listening" element={<Audio />} />
 
           </Routes>
