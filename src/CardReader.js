@@ -16,6 +16,7 @@ import Typography from '@mui/material/Typography';
 import { useParams } from 'react-router-dom';
 import {Link} from 'react-router-dom'
 import CardImage from './CardImage';
+import Service from './Service';
 
 const axios=require('axios').default;
 
@@ -39,7 +40,7 @@ export default function CardReader(props) {
                 transcriptionVariant: data.transcriptions&&data.transcriptions.length>0?data.transcriptions[0].variant:null,
                 expression: data.expression,
                 definition: data.definition,
-                photoUrl: data.photoId!=null?"http://localhost:8082/Files/"+data.photoId:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Test-Logo.svg/783px-Test-Logo.svg.png",
+                photoUrl: data.photoId!=null?"http://localhost:8081/Files/"+data.photoId:Service.imageDefault,
                 partOfSpeech: data.partOfSpeech.name,
                 exampleList: data.examples?data.examples:[]
             });

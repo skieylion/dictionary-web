@@ -63,14 +63,14 @@ export default function Student(props) {
                 container.contextId=context.id;
                 container.contextListId=contextListId;
             } else if (module=="example") {
-                container.expressionValue=context.expressionValue;
-                container.text=Service.getTextByExampleListAndExpressionValue(context.exampleList,container.expressionValue);
+                container.expressionValue=context.expression;
+                container.text=Service.getTextByExampleListAndExpressionValue(context.examples,container.expressionValue);
                 
                 container.check=(check)=>{
                     container.checkPlayer=check;
                 };
             } else if (module=="def") {
-                container.expressionValue=context.expressionValue;
+                container.expressionValue=context.expression;
                 container.text=context.definition ;
                 container.check=(check)=>{
                     container.checkPlayer=check;
@@ -183,12 +183,10 @@ export default function Student(props) {
     };
 
     useEffect(() => {   
-        
-        Rest.getContextListForStudent(function(list){
+        Rest.getStudentCards(contextListId,maxCountInit).then(function(list){
             console.log("start",list);
             start(list);
-        },contextListId,maxCountInit);
-
+        });
     },[]);
 
     return (
@@ -210,7 +208,7 @@ export default function Student(props) {
                             <Stack spacing={1}>
                                 {
                                     container.module=="reader" &&
-                                    <CardReader contextListId={container.contextListId} contextId={container.contextId}  />
+                                    <CardReader cardId={container.contextId}  />
                                 }
                                 {
                                     (container.module=="example" || container.module=="def") &&

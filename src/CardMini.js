@@ -29,6 +29,8 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import { makeStyles } from '@material-ui/core/styles';
 import Rest from './Rest';
+import AudioButton from './AudioButton';
+
 
 const theme = createTheme({
     typography: {
@@ -51,7 +53,7 @@ export default function CardMini(props) {
 
     let {card}=useParams();
     card=props.card;
-
+    
     return (
         <Card  sx={{ width: 220, height:220, border:2 }}>
             <CardMedia
@@ -65,11 +67,12 @@ export default function CardMini(props) {
                 <ThemeProvider theme={theme}>
                     <Typography variant="subtitle1" sx={{lineHeight: 1}}>
                         <b><span title={card.expression}>{Rest.cut(card.expression,12)}</span></b> (<span title={card.speechPart}>{Rest.cut(card.speechPart,5)}</span>) &nbsp;&nbsp;
-                        <Tooltip title="listen to" sx={{m:0,p:0}}>
-                            <IconButton  sx={{m:0,p:0}}>
-                                <VolumeUpIcon  sx={{m:0,p:0}} />
-                            </IconButton>
-                        </Tooltip>
+                        
+                        {
+                            card.audioFile &&
+                            <AudioButton source={card.audioFile} type={"VolumeUpIcon"} />
+                        }
+                        
                         <Typography sx={{
                             display: '-webkit-box',
                             overflow: 'hidden',
@@ -98,16 +101,16 @@ export default function CardMini(props) {
                     </IconButton>
                 </Tooltip>
                 <Tooltip title="Delete" sx={{m:0,p:0}}>
-                    <IconButton  sx={{m:0,p:0}}>
+                    <IconButton  sx={{m:0,p:0}} onClick={function(){
+                        if(window.confirm("Would You like to delete this card ?")) {
+                            Rest.deleteCard(card.cardId);
+                            if(props.delete) props.delete(card.cardId);
+                        }
+                        
+                    }} >
                         <DeleteIcon  sx={{m:0,p:0}} />
                     </IconButton>
                 </Tooltip>
-                <Tooltip title="Delete forever" sx={{m:0,p:0}}>
-                    <IconButton  sx={{m:0,p:0}}>
-                        <DeleteForeverIcon  sx={{m:0,p:0}} />
-                    </IconButton>
-                </Tooltip>
-                
             </CardActions>
         </Card>
     );

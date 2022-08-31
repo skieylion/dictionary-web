@@ -116,7 +116,8 @@ export default function NewSlotCard() {
                         }
 
                         if(title&&title.current.value&&title.current.value!=""){
-                          if(newImage){
+                          if(newImage && typeof newImage == "string"){
+                            console.log("newImage:",newImage)
                             Rest.saveFile(newImage,save);
                           } else {
                             save(null);

@@ -37,6 +37,15 @@ const lexical_categories=[
 
 
 let Rest =  {
+    getStudentCards:function(slotId,limit){
+        return axios({
+            method:"GET",
+            url:"http://localhost:8081/student/slots/"+slotId+"/cards?limit="+limit
+        }).then(res => {
+            return res.data;
+        })
+        .catch(err => console.error(err));
+    },
     findPhotos:function(query){
         return axios({
             method:"GET",
@@ -153,7 +162,7 @@ let Rest =  {
         rec([],"UNREPEATED");
     },
     setRepeatContext:function(contextId,f){
-        var url="http://localhost:8081/Context/"+contextId+"/ContextStatus/REPEATED";
+        var url="http://localhost:8081/repeat/cards/"+contextId;
         axios
             .post(url)
             .then(response=>{
@@ -199,6 +208,14 @@ let Rest =  {
         console.log("mime",mime)
         return new File([u8arr], filename, {type:mime});
     },
+    uuidv4:function(){
+        function uuidv4() {
+            return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+            );
+        }
+        return uuidv4();
+    },
     saveFileV2:function(bytes,fs){
         function uuidv4() {
             return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
@@ -215,7 +232,7 @@ let Rest =  {
         //file.name
         axios({
             method:"POST",
-            url:"http://localhost:8082/Files?fileId="+guid,
+            url:"http://localhost:8081/Files?fileId="+guid,
             data:bodyFormData,
             headers: { 
                 "Content-Type": "multipart/form-data",
@@ -244,7 +261,7 @@ let Rest =  {
         //file.name
         axios({
             method:"POST",
-            url:"http://localhost:8082/Files?fileId="+guid,
+            url:"http://localhost:8081/Files?fileId="+guid,
             data:bodyFormData,
             headers: { 
                 "Content-Type": "multipart/form-data",
@@ -269,6 +286,37 @@ let Rest =  {
     cut:function(str,size){
         if(str.length<size) return str;
         return str.substring(0,size)+"...";
+    },
+    deleteCard:function(cardId){
+        axios({
+            method:"DELETE",
+            url:"http://localhost:8081/cards/"+cardId,
+            headers: { 
+                "Content-Type": "text/plain",
+                "Access-Control-Request-Method":"DELETE",
+                "Access-Control-Allow-Origin":"http://localhost:3000/"
+            }
+        }).then(response=>{
+            console.log("response",response);
+        }).catch(error=>{
+            console.log(error);
+        });
+    },
+    deleteSlot:function(slotId,f){
+        axios({
+            method:"DELETE",
+            url:"http://localhost:8081/slots/"+slotId,
+            headers: { 
+                "Content-Type": "text/plain",
+                "Access-Control-Request-Method":"DELETE",
+                "Access-Control-Allow-Origin":"http://localhost:3000/"
+            }
+        }).then(response=>{
+            console.log("response",response);
+            f();
+        }).catch(error=>{
+            console.log(error);
+        });
     }
     
 

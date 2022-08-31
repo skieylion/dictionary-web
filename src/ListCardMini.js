@@ -57,6 +57,9 @@ export default function ListCardMini() {
     Rest.getCardsBySlotId(slotId,offset,25,function(response){
       console.log("cards by slot id: ", response);
       if(response && response.data) {
+        console.log("-------------")
+    console.log(response.data)
+    console.log("-------------")
         let arr = [...cardList];
         for(let card of response.data) {
           arr.push({
@@ -65,7 +68,8 @@ export default function ListCardMini() {
             definition: card.definition,
             speechPart: card.partOfSpeech.name,
             example: card.examples && card.examples.length?card.examples[0].text:"",
-            image: card.photoId!=null?"http://localhost:8082/Files/"+card.photoId:imageDefault
+            image: card.photoId!=null?"http://localhost:8081/Files/"+card.photoId:imageDefault,
+            audioFile:card.transcriptions && card.transcriptions[0] && card.transcriptions[0].fileId ? "http://localhost:8081/Files/"+card.transcriptions[0].fileId:null
           });
         }
         setCardList(arr);
@@ -103,7 +107,18 @@ export default function ListCardMini() {
               cardList.map((card,index)=>(
                   <Grid item xs="auto">
                       <Item>
-                          <CardMini card={card} />
+                          <CardMini card={card} 
+                            delete={function(cardId){
+                              let arr = [...cardList];
+                              let newArr=[];
+                              for(let i=0;i<arr.length;i++) {
+                                if(arr[i].cardId!=cardId){
+                                  newArr.push(arr[i]);
+                                }
+                              }
+                              setCardList(newArr);
+                            }} 
+                          />
                       </Item>
                   </Grid>
               ))

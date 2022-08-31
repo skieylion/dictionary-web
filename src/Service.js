@@ -1,3 +1,8 @@
+import ImageDefault from './ImageDefault';
+
+
+const imageDefault=ImageDefault.imageModule;
+
 let Service =  {
     getTextByExampleListAndExpressionValue:(exampleList,expressionValue)=>{
         for(let j=0;j<exampleList.length;j++){
@@ -13,6 +18,7 @@ let Service =  {
         }
         return "";
     },
+    imageDefault:imageDefault
 }
 
 export default Service;

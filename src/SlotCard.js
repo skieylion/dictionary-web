@@ -70,6 +70,18 @@ export default function SlotCard(props) {
                         <SchoolIcon  sx={{m:0,p:0}} />
                     </IconButton>
                 </Tooltip>
+                <Tooltip title="Delete" sx={{m:0,p:0}}>
+                    <IconButton  sx={{m:0,p:0}} onClick={function(){
+                        if(window.confirm("Would You like to delete this slot ?")) {
+                            Rest.deleteSlot(slotId,function(){
+                                document.location.reload();
+                            });
+                        }
+                        
+                    }} >
+                        <DeleteIcon  sx={{m:0,p:0}} />
+                    </IconButton>
+                </Tooltip>
             </CardActions>
         </Card>
     );

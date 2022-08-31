@@ -46,6 +46,8 @@ export default function CardWriter() {
     const [wordList, setWordList] = useState([]);
     const [currentWord, setCurrentWord] = useState({});
     const [defValue,setDefValue]=useState('');
+    const [isSearch,setIsSearch]=React.useState(false);
+    const [isPicture,setIsPicture]=React.useState(false);
 
     useEffect(() => {
         setGuid(uuidv4());
@@ -118,10 +120,10 @@ export default function CardWriter() {
     const definitionValue=React.useRef('');
     const translateValue=React.useRef('');
     const [exprValue,setExprValue]=React.useState('');
-    const [isSearch,setIsSearch]=React.useState(false);
+    
+    
     const [photoFile,setPhotoFile]=React.useState('');
     const [photoFileFormat,setPhotoFileFormat]=React.useState('');
-
 
     const getRemoveArray=function(list,key){
         let listNew=[...list];
@@ -290,7 +292,7 @@ export default function CardWriter() {
         bodyFormData.append('file', file,file.name);
         axios({
             method:"POST",
-            url:"http://localhost:8082/Files?fileId="+uid,
+            url:"http://localhost:8081/Files?fileId="+uid,
             data:bodyFormData,
             headers: { 
                 "Content-Type": "multipart/form-data",
@@ -315,7 +317,7 @@ export default function CardWriter() {
         //bodyFormData.append('name', file.name);
         axios({
             method:"POST",
-            url:"http://localhost:8082/Files?fileId="+guid,
+            url:"http://localhost:8081/Files?fileId="+guid,
             data:bodyFormData,
             headers: { 
                 "Content-Type": "multipart/form-data",
@@ -375,7 +377,7 @@ export default function CardWriter() {
                     translate:translateValue.current.value,
                     transcriptionList:transcriptionDtoList,
                     exampleList:[],
-                    cardListIds:cardListIds
+                    slotIds:cardListIds
                 };
     
                 let exampleList=[...examples];
@@ -454,6 +456,7 @@ export default function CardWriter() {
                             if(e.code=="Enter") {
                                 if(exprValue && exprValue.length>2) {
                                     console.log(exprValue);
+                                    setIsPicture(true);
                                     setIsSearch(true);
                                     query(exprValue);
                                     Rest.find(exprValue)
@@ -542,7 +545,7 @@ export default function CardWriter() {
                     </Box>
                 }
                 </Stack>
-                <Stack spacing={0}>
+                <Stack spacing={0} sx={{ display: isPicture?'block':'none' }}>
                     <Stack justifyItems="center" alignItems="center">
                         <Stack spacing={1} sx={{width:650}}>
                             <CardImage role="writer" 
