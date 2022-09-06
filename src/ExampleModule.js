@@ -19,50 +19,32 @@ import CardImage from './CardImage';
 import CardReader from './CardReader';
 import Rest from './Rest';
 import Service from './Service';
-
+import TextMystery from './TextMystery';
 
 const axios=require('axios').default;
 
-export default function TextMystery(props) {
-
-    //id="standard-basic32"
-    //const containerKey=
-    const buffer=React.useRef('');
-    let currentAnswer={};
-    Object.assign(currentAnswer,buffer);
-
-    const expressionValue=props.expressionValue;
-    const [text,setText]=useState(props.text);
+export default function ExampleModule(props) {
     
-
-    const getRandomInt=function(max) {
-        return Math.floor(Math.random() * max);
-    }
-
-    props.check(()=>{
-        let rightAnswer=expressionValue; rightAnswer=rightAnswer?rightAnswer.toUpperCase():null;
-        let curAnswer=currentAnswer.current.value; curAnswer=curAnswer?curAnswer.toUpperCase():null;
-        
-        if(curAnswer&&rightAnswer&&rightAnswer==curAnswer){
-            return true;
-        } else {
-            return false;
-        }
-    });
-
+    const [examples,setExamples]=useState([]);
 
     useEffect(()=>{
-        setText(text);
+        setExamples(props.examples);
     },[]);
 
     return (
-        <Stack sx={{width:'100%'}}>
-            <Typography variant="h5">
-                <i>{text}</i>
-            </Typography>
+        <Stack>
             <br/>
-            <TextField fullWidth inputRef={currentAnswer}  label="Выражение"  variant="outlined" />
-            <br/>
+            {
+                examples.map((example,index)=>(
+                    <Stack>
+                        <Typography variant="h5">
+                            <i><b>{index+1}.</b> {Service.replaceSubtextBySymbols(example.text,props.expressionValue,"_")}</i>
+                        </Typography>
+                        <br/>
+                    </Stack>
+                ))
+            }
+            <TextMystery  check={props.check} expressionValue={props.expressionValue} text={""} />
         </Stack>
     );
 };

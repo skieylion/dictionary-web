@@ -1,5 +1,4 @@
-import * as React from 'react';
-
+import React,{Component,useState, useEffect} from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -28,7 +27,7 @@ import SendIcon from '@mui/icons-material/Send';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import StarBorder from '@mui/icons-material/StarBorder';
-
+import Badge from '@mui/material/Badge';
 
 import {
   BrowserRouter as Router,
@@ -97,12 +96,27 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   justifyContent: 'flex-end',
 }));
 
+const axios=require('axios').default;
 
 
 function PersistentDrawerLeftList() {
 
   const [open, setOpen] = React.useState(true);
   const [open2, setOpen2] = React.useState(true);
+  const [overdueCount, setOverdueCount] = useState(0);
+
+
+  useEffect(() => {   
+    axios.get("http://localhost:8081/slots")
+    .then(response=>{
+        let sum=0;
+        for(let slot of response.data){
+          sum+=slot.slotStat.overdueCount;
+        }
+        setOverdueCount(sum);
+        //console.log("response = ", response);
+    });
+},[]);
   
 
   const handleClick = () => {
@@ -167,7 +181,7 @@ function PersistentDrawerLeftList() {
       </ListItemButton>
       <ListItemButton>
         <Link to="/slots">
-          <ListItemText primary="slots" />
+        <Badge color="error" badgeContent={overdueCount}><ListItemText primary="slots" /></Badge>
         </Link>
       </ListItemButton>
       {/* <ListItemButton>

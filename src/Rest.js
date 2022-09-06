@@ -42,6 +42,7 @@ let Rest =  {
             method:"GET",
             url:"http://localhost:8081/student/slots/"+slotId+"/cards?limit="+limit
         }).then(res => {
+            console.log("slots:",res);
             return res.data;
         })
         .catch(err => console.error(err));

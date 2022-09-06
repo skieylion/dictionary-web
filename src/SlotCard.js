@@ -34,10 +34,8 @@ const axios=require('axios').default;
 
 export default function SlotCard(props) {
 
-    let {name,image,slotId}=useParams();
-    name=props.name;
-    image=props.image;
-    slotId=props.slotId;
+    let {slot}=useParams();
+    slot=props.slot;
 
     return (
         <Card  sx={{ width: 300, height:300, border:2 }}>
@@ -45,27 +43,27 @@ export default function SlotCard(props) {
                 <CardMedia
                     component="img"
                     height="180"
-                    image={image}
+                    image={slot.image}
                     alt="green iguana"
                     sx={{borderBottom: 1 }}
                 />
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="div">
-                        {name}
+                        {slot.name}
                     </Typography>
                 </CardContent>
             </CardActionArea>
             <CardActions >
                 <Tooltip title="View" sx={{m:0,p:0}}>
                     <IconButton  sx={{m:0,p:0}} onClick={function(){
-                        Rest.toLink("/slots/"+slotId+"/cards");
+                        Rest.toLink("/slots/"+slot.slotId+"/cards");
                     }} >
                         <RemoveRedEyeIcon  sx={{m:0,p:0}} />
                     </IconButton>
                 </Tooltip>
                 <Tooltip title="Learn" sx={{m:0,p:0}}>
                     <IconButton  sx={{m:0,p:0}} onClick={function(){
-                        Rest.toLink("/slots/"+slotId+"/student");
+                        Rest.toLink("/slots/"+slot.slotId+"/student");
                     }} >
                         <SchoolIcon  sx={{m:0,p:0}} />
                     </IconButton>
@@ -73,7 +71,7 @@ export default function SlotCard(props) {
                 <Tooltip title="Delete" sx={{m:0,p:0}}>
                     <IconButton  sx={{m:0,p:0}} onClick={function(){
                         if(window.confirm("Would You like to delete this slot ?")) {
-                            Rest.deleteSlot(slotId,function(){
+                            Rest.deleteSlot(slot.slotId,function(){
                                 document.location.reload();
                             });
                         }
@@ -82,7 +80,16 @@ export default function SlotCard(props) {
                         <DeleteIcon  sx={{m:0,p:0}} />
                     </IconButton>
                 </Tooltip>
+                <Box display="flex" justifyContent="flex-end" sx={{width:'100%'}}>
+                    <font size='+1'>
+                    <font color="red" ><b>{slot.slotStat.overdueCount+"  "}</b></font>
+                    / <font color="#FF8C00" >{slot.slotStat.waitingCount+"  "}</font>
+                    / <font color="green">{slot.slotStat.studiedCount+"  "}</font>
+                    / <font color="black" >{slot.slotStat.totalCount+"  "}</font>
+                    </font>
+                </Box>
             </CardActions>
+            
         </Card>
     );
 };

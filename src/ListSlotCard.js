@@ -39,7 +39,8 @@ export default function ListSlotCard() {
                 arr.push({
                     slotId: slot.id,
                     name: slot.name,
-                    image:slot.fileId && slot.fileId!=""? "http://localhost:8081/Files/"+slot.fileId:ImageDefault.defaultImage
+                    image:slot.fileId && slot.fileId!=""? "http://localhost:8081/Files/"+slot.fileId:ImageDefault.defaultImage,
+                    slotStat:slot.slotStat
                 });
             }
             setSlotList(arr);
@@ -58,7 +59,7 @@ export default function ListSlotCard() {
                 slotList.map((slot,index)=>(
                     <Grid item xs="auto">
                         <Item>
-                            <SlotCard name={slot.name} image={slot.image} slotId={slot.slotId}  />
+                            <SlotCard slot={slot}/>
                         </Item>
                     </Grid>
                 ))
