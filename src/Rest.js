@@ -85,6 +85,20 @@ let Rest =  {
         xmlHttp.open("GET", "http://localhost:8081/loader/audio?url="+url, true); // true for asynchronous 
         xmlHttp.send(null);
     },
+    getAudioByURL:function(url,callback) {
+        //let path=theUrl.replace("https://audio.oxforddictionaries.com","");
+        
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.onreadystatechange = function() { 
+            if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                callback(xmlHttp.response);
+            }
+        }
+        
+        xmlHttp.open("GET", url, true); // true for asynchronous 
+        xmlHttp.send(null);
+    },
+
     getPhoto:function(url,callback) {
         //let path=theUrl.replace("https://audio.oxforddictionaries.com","");
         const params = new URLSearchParams(url)
@@ -318,6 +332,11 @@ let Rest =  {
         }).catch(error=>{
             console.log(error);
         });
+    },
+    getCard:function(cardId){
+        return axios.get("http://localhost:8081/cards/"+cardId)
+        .then(res => res.data)
+        .catch(err => console.error(err));
     }
     
 

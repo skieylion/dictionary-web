@@ -26,6 +26,8 @@ export default function CardEditor(props) {
 
     const [contextReader,setContextReader] = useState({});
 
+    
+
     useEffect(() => {
         if(role=="writer") {
             axios.get("http://localhost:8081/PartOfSpeech")

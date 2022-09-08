@@ -97,7 +97,9 @@ export default function CardMini(props) {
                 </Tooltip>
                 <Tooltip title="Edit" sx={{m:0,p:0}}>
                     <IconButton  sx={{m:0,p:0}}>
-                        <EditIcon  sx={{m:0,p:0}} />
+                        <EditIcon  sx={{m:0,p:0}}  onClick={function(){
+                            Rest.toLink("/writer?mode=edit&cardId="+card.cardId);
+                        }} />
                     </IconButton>
                 </Tooltip>
                 <Tooltip title="Delete" sx={{m:0,p:0}}>

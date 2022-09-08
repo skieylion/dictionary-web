@@ -35,9 +35,8 @@ const axios=require('axios').default;
 
 
 
-export default function CardWriter() {
+export default function CardWriter(props) {
 
-    const {contextListId}=useParams();
     const [partOfSpeechList, setPartOfSpeechList] = useState([]);
     const [guid, setGuid] = useState([]);
     const [transcriptionSound, setTranscriptionSound] = React.useState('UK');
@@ -48,6 +47,22 @@ export default function CardWriter() {
     const [defValue,setDefValue]=useState('');
     const [isSearch,setIsSearch]=React.useState(false);
     const [isPicture,setIsPicture]=React.useState(false);
+
+    const getParams=function findGetParameter(parameterName) {
+        var result = null,
+            tmp = [];
+        window.location.search
+            .substr(1)
+            .split("&")
+            .forEach(function (item) {
+              tmp = item.split("=");
+              if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
+            });
+        return result;
+    };
+
+    const mode=getParams("mode");
+    const cardId=getParams("cardId");
 
     useEffect(() => {
         setGuid(uuidv4());
@@ -72,7 +87,56 @@ export default function CardWriter() {
             }
             setCardList(data);
         });
+
+        console.log("mode = ",getParams("mode"));console.log("cardId = ",cardId);
+
+        if(mode=="edit") {
+            Rest.getCard(cardId)
+            .then(function(card){
+                fillCard(card);
+            });
+        };
+
     },[]);
+
+    const setTranscriptionsFromCard=function(card){
+        let transciptions=[];
+        for(let i=0;i<card.transcriptions.length;i++) {
+            let tr=card.transcriptions[i];
+            transciptions.push({
+                spelling:tr.value,
+                phoneticSpelling: tr.value,
+                audioFile:tr.fileId?"http://localhost:8081/Files/"+tr.fileId:null,
+                isURL:true,
+                isFile:false
+            });
+        }
+        console.log("transciptions",transciptions);
+        setTranscription(transciptions);
+    }
+    const setExamplesFromCard=function(card){
+        let examples=[];
+        for(let i=0;i<card.examples.length;i++) {
+            examples.push(card.examples[i].text);
+        }
+        setExampleList(examples);
+    }
+    const fillCard=function(card) {
+
+        console.log("card = ", card);
+        setWordList([]);
+        setExprValue(card.expression);
+        setDefValue(card.definition);
+        setPartOfSpeechId(card.partOfSpeech.id);
+        setExamplesFromCard(card);
+        setTranscriptionsFromCard(card);
+
+        
+
+        //setCardImage ...
+        //setCurrentWord(e); ?
+    }
+
 
     const fillCurrentWord=function(){
 
@@ -165,10 +229,14 @@ export default function CardWriter() {
 
     const loadAudio=function(index, listTr,callback){
         if(index<listTr.length) {
-            Rest.getAudio(listTr[index].audioFile,function(result){
-                listTr[index].resultAudio=Rest.base64ToArrayBuffer(result);
+            if(!listTr[index].isURL) {
+                Rest.getAudio(listTr[index].audioFile,function(result){
+                    listTr[index].resultAudio=Rest.base64ToArrayBuffer(result);
+                    loadAudio(index+1,listTr,callback);
+                });
+            } else {
                 loadAudio(index+1,listTr,callback);
-            });
+            }
         } else {
             callback(listTr);
         }
@@ -447,6 +515,14 @@ export default function CardWriter() {
     }
 
 
+    const getFile=function(e){
+        console.log("file arr = ",e.isFile, e.file);
+        if(e.isFile && e.file){
+            return Buffer.from(e.file).toString('base64');
+        }
+        return "";
+    }
+
     return (
         <Stack justifyItems="center" alignItems="center">
             <Stack spacing={1} sx={{width:650}}>
@@ -647,9 +723,9 @@ export default function CardWriter() {
                                         <audio id={"audio_"+e.key} controls preload="none" hidden>
                                             <source src={
                                                 e.isFile==true?
-                                                ("data:audio/mp3;base64,"+Buffer.from(e.file).toString('base64'))
+                                                ("data:audio/mp3;base64,"+getFile(e))
                                                 :(e.isURL==true && e.resultAudio?(
-                                                    ("data:audio/mp3;base64,"+e.resultAudio)
+                                                    (e.resultAudio)
                                                 ):"")
                                             } type="audio/mpeg" />
                                         </audio>
@@ -702,7 +778,7 @@ export default function CardWriter() {
                 />
                 <Stack spacing={1} direction="row">
                     <Button fullWidth size="small" onClick={clickSaveContext}  variant="contained">Сохранить</Button>
-                    <Button fullWidth size="small" component={Link} to={"/ContextList/"+contextListId+"/Context"} variant="contained">Отменить</Button>
+                    <Button fullWidth size="small" component={Link} to={"/"} variant="contained">Отменить</Button>
                 </Stack>
             </Stack>
         </Stack>
