@@ -30,7 +30,7 @@ import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import { makeStyles } from '@material-ui/core/styles';
 import Rest from './Rest';
 import AudioButton from './AudioButton';
-
+import Utils from './Utils';
 
 const theme = createTheme({
     typography: {
@@ -66,7 +66,7 @@ export default function CardMini(props) {
             <CardContent sx={{m:0,p:0,ml:1,mr:1, }}>
                 <ThemeProvider theme={theme}>
                     <Typography variant="subtitle1" sx={{lineHeight: 1}}>
-                        <b><span title={card.expression}>{Rest.cut(card.expression,12)}</span></b> (<span title={card.speechPart}>{Rest.cut(card.speechPart,5)}</span>) &nbsp;&nbsp;
+                        <b><span title={card.expression}>{Utils.cut(card.expression,12)}</span></b> (<span title={card.speechPart}>{Utils.cut(card.speechPart,5)}</span>) &nbsp;&nbsp;
                         
                         {
                             card.audioFile &&

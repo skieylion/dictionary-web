@@ -1,35 +1,29 @@
 import React,{Component,useState, useEffect} from 'react';
 import Stack from '@mui/material/Stack';
-import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-import Checkbox from '@mui/material/Checkbox';
-import { getBottomNavigationUtilityClass } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Typography from '@mui/material/Typography';
-import { useParams } from 'react-router-dom';
 import {Link} from 'react-router-dom'
 import CardImage from './CardImage';
 import {v4 as uuidv4} from 'uuid';
-import AttachFileOutlinedIcon from '@mui/icons-material/AttachFileOutlined';
-import FileDownloadDoneOutlinedIcon from '@mui/icons-material/FileDownloadDoneOutlined';
-import $ from "jquery";
+
 import Rest from './Rest';
-import AttachmentOutlinedIcon from '@mui/icons-material/AttachmentOutlined';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
 import Divider from '@mui/material/Divider';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import IconButton from '@mui/material/IconButton';
-import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import CircularProgress from '@mui/material/CircularProgress';
+import AudioButton from './AudioButton';
+import Utils from './Utils';
+import Transciption from './Transcription';
 
 const axios=require('axios').default;
 
@@ -39,7 +33,6 @@ export default function CardWriter(props) {
 
     const [partOfSpeechList, setPartOfSpeechList] = useState([]);
     const [guid, setGuid] = useState([]);
-    const [transcriptionSound, setTranscriptionSound] = React.useState('UK');
     const [cardList, setCardList] = useState([]);
     const [cardListIds, setCardListIds] = useState([]);
     const [wordList, setWordList] = useState([]);
@@ -47,22 +40,13 @@ export default function CardWriter(props) {
     const [defValue,setDefValue]=useState('');
     const [isSearch,setIsSearch]=React.useState(false);
     const [isPicture,setIsPicture]=React.useState(false);
+    const [translateText,setTranslateText]=useState('');
+    const [defSlots,setDefSlots]=useState([]);
 
-    const getParams=function findGetParameter(parameterName) {
-        var result = null,
-            tmp = [];
-        window.location.search
-            .substr(1)
-            .split("&")
-            .forEach(function (item) {
-              tmp = item.split("=");
-              if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
-            });
-        return result;
-    };
+    const mode=Utils.getParams("mode");
+    const cardId=Utils.getParams("cardId");
 
-    const mode=getParams("mode");
-    const cardId=getParams("cardId");
+    const buffer=React.useRef('');
 
     useEffect(() => {
         setGuid(uuidv4());
@@ -88,7 +72,7 @@ export default function CardWriter(props) {
             setCardList(data);
         });
 
-        console.log("mode = ",getParams("mode"));console.log("cardId = ",cardId);
+        console.log("mode = ",Utils.getParams("mode"));console.log("cardId = ",cardId);
 
         if(mode=="edit") {
             Rest.getCard(cardId)
@@ -99,21 +83,7 @@ export default function CardWriter(props) {
 
     },[]);
 
-    const setTranscriptionsFromCard=function(card){
-        let transciptions=[];
-        for(let i=0;i<card.transcriptions.length;i++) {
-            let tr=card.transcriptions[i];
-            transciptions.push({
-                spelling:tr.value,
-                phoneticSpelling: tr.value,
-                audioFile:tr.fileId?"http://localhost:8081/Files/"+tr.fileId:null,
-                isURL:true,
-                isFile:false
-            });
-        }
-        console.log("transciptions",transciptions);
-        setTranscription(transciptions);
-    }
+    
     const setExamplesFromCard=function(card){
         let examples=[];
         for(let i=0;i<card.examples.length;i++) {
@@ -121,6 +91,24 @@ export default function CardWriter(props) {
         }
         setExampleList(examples);
     }
+
+    const setSlots=function(card){
+        let slots=[];
+        let slotList=[];
+        for(let i=0;i<card.slots.length;i++) {
+            slots.push(card.slots[i].id);
+            slotList.push({
+                title: card.slots[i].name,
+                id: card.slots[i].id
+            });
+        }
+        setCardListIds(slots);
+        setDefSlots(slotList);
+
+        console.log("slotList",slotList);
+    }
+
+
     const fillCard=function(card) {
 
         console.log("card = ", card);
@@ -130,26 +118,16 @@ export default function CardWriter(props) {
         setPartOfSpeechId(card.partOfSpeech.id);
         setExamplesFromCard(card);
         setTranscriptionsFromCard(card);
-
-        
+        setTranslateText(card.translate);
+        setSlots(card);
 
         //setCardImage ...
         //setCurrentWord(e); ?
     }
 
-
-    const fillCurrentWord=function(){
-
-    }
-
-    const buffer=React.useRef('');
     
-    const [keyIndex,setKeyIndex]=React.useState(3);
-
-    const getKeyIndex=function(){
-        setKeyIndex(keyIndex+1);
-        return keyIndex;
-    }
+    
+    
 
     
 
@@ -161,26 +139,13 @@ export default function CardWriter(props) {
             value:""
         }
     ]);
-    const [transcriptionArray,setTranscriptionArray]=React.useState([
-        {
-            key:1,
-            text:React.useRef(''),
-            transcription:React.useRef('UK'),
-            spelling:"",
-            link:""
-        }
-    ]);
+    
 
-    const handleChangeTranscriptionSound = (event,index) => {
-        let listNew=[...transcriptionArray];
-        listNew[index].transcription=event.target.value;
-        setTranscriptionArray(listNew);
-    };
+    
 
     const [partOfSpeechId,setPartOfSpeechId]=React.useState(-1);
 
     const expressionValue=React.useRef('');
-    const transcriptionValue=React.useRef('');
     const definitionValue=React.useRef('');
     const translateValue=React.useRef('');
     const [exprValue,setExprValue]=React.useState('');
@@ -189,27 +154,7 @@ export default function CardWriter(props) {
     const [photoFile,setPhotoFile]=React.useState('');
     const [photoFileFormat,setPhotoFileFormat]=React.useState('');
 
-    const getRemoveArray=function(list,key){
-        let listNew=[...list];
-        for(let i=0;i<listNew.length;i++){
-            if(listNew[i].key==key) {
-                listNew.splice(i,1);
-                break;
-            }
-        }
-        return listNew;
-    }
-
-    const getAddArray=function(list){
-        let newArr=[...list];
-        let v={};
-        Object.assign(v,buffer)
-        newArr.push({
-            key:getKeyIndex(),
-            text:v
-        });
-        return newArr;
-    }
+    
 
     const setExampleList=function(listText) {
         let newArr=[];
@@ -218,7 +163,7 @@ export default function CardWriter(props) {
             let v={};
             Object.assign(v,buffer)
             newArr.push({
-                key:getKeyIndex(),
+                key:Utils.getKeyIndex(),
                 text: v,
                 value:text
             });
@@ -227,273 +172,82 @@ export default function CardWriter(props) {
         setExamples(newArr);
     }
 
-    const loadAudio=function(index, listTr,callback){
-        if(index<listTr.length) {
-            if(!listTr[index].isURL) {
-                Rest.getAudio(listTr[index].audioFile,function(result){
-                    listTr[index].resultAudio=Rest.base64ToArrayBuffer(result);
-                    loadAudio(index+1,listTr,callback);
-                });
-            } else {
-                loadAudio(index+1,listTr,callback);
-            }
-        } else {
-            callback(listTr);
-        }
-        
-    }
+    
 
-    const setTranscription=function(listTr) {
-        let newArr=[];
-
-        loadAudio(0,listTr,function(listTr){
-            for(let i=0;i<listTr.length;i++) {
-                let tr=listTr[i];
-                let v1={
-                    current:{
-                        value:''
-                    }
-                };
-
-                Object.assign(v1,buffer);
-                newArr.push({
-                    key:getKeyIndex(),
-                    text:v1,
-                    value:tr.spelling,
-                    transcription:'UK',
-                    spelling:tr.phoneticSpelling,
-                    link:tr.audioFile,
-                    file:tr.resultAudio,
-                    isFile:true
-                });
-            }
-            if(newArr.length==0){
-                let v={};
-                Object.assign(v,buffer);
-                newArr.push({
-                    key:getKeyIndex(),
-                    text:v
-                });
-            }
-            setTranscriptionArray(newArr);
-        });
-    }
+    
 
     //примеры
     const clickRemoveExample=function(e){
         console.log(e);
         if(examples.length>1) {
-            setExamples(getRemoveArray(examples,e.key));
+            setExamples(Utils.getRemoveArray(examples,e.key));
         } else {
             //alert("Контекст должен содержать не менее 1 примера")
         }
     }
 
     const clickAddExample=function(){
-        setExamples(getAddArray(examples));
+        setExamples(Utils.getAddArray(examples,buffer));
     }
     //транскрипция
-    const clickRemoveTranscription=function(e){
-        console.log(e);
-        if(transcriptionArray.length>1) {
-            setTranscriptionArray(getRemoveArray(transcriptionArray,e.key));
+    
+    const getCard=function(photoId) {
+        return {
+            photoId:photoId,
+            partOfSpeechId:partOfSpeechId,
+            expression:expressionValue.current.value,
+            definition:definitionValue.current.value,
+            translate:translateValue.current.value,
+            transcriptionList:Utils.getTranscriptionDtoList(transcriptionArrayList),
+            exampleList:[],
+            slotIds:cardListIds
+        };
+    };
+
+    const fillExamples=function(card) {
+        let exampleList=[...examples];
+        for(let e of exampleList){
+            card.exampleList.push(e.text.current.value);
+        }
+    };
+
+    const after=function(){
+        window.confirm("Сохранено! Покинуть страницу ?");
+        let isLeave=window.confirm("Сохранено! Покинуть страницу ?");
+        if(isLeave){
+            window.history.back();
         } else {
-            //alert("Контекст должен содержать не менее 1 примера")
-        }
-    }
-    const clickAddTranscription=function(){
-        if(checkTranscriptionArray()) {
-            console.log("transcriptionArray",transcriptionArray);
-            setTranscriptionArray(getAddArray(transcriptionArray));
+            window.location.reload();
         }
     }
 
-
-    const dataURLtoFile=function(dataurl, filename) {
- 
-        var arr = dataurl.split(','),
-            mime = arr[0].match(/:(.*?);/)[1],
-            bstr = atob(arr[1]), 
-            n = bstr.length, 
-            u8arr = new Uint8Array(n);
-            
-        while(n--){
-            u8arr[n] = bstr.charCodeAt(n);
-        }
-        
-        return new File([u8arr], filename, {type:mime});
-    }
-
-    const addArrayBufferFile=function(file,e){
-        let reader = new FileReader();
-        reader.readAsArrayBuffer(file);
-        reader.onload = function() {
-            e.file=reader.result;
-            e.isFile=true;
-            setTranscriptionArray([...transcriptionArray]);
-        };
-        reader.onerror = function() {
-            console.log(reader.error);
-        };
-    }
-
-    const checkTranscriptionArray=function(){
-        let transcriptionArrayList=[...transcriptionArray];
-        for(let tr of transcriptionArrayList){
-            if(tr.transcription!="US" && tr.transcription!="UK") {
-                console.log(tr.transcription)
-                alert("Укажите акцент");
-                return false;
-            }
-            if(!(tr.text && tr.text.current && tr.text.current.value && tr.text.current.value!="")) {
-                alert("Определите транскрипцию");
-                return false;
-            }
-        }
-        return true;
-    }
-
-    const saveFileToServer=(data8,mime,fsuccess,ferror)=>{
-        var uid=uuidv4();
-        var file= new File([data8], uid+"."+mime, {type:mime});
-        var bodyFormData = new FormData();
-        bodyFormData.append('file', file,file.name);
-        axios({
-            method:"POST",
-            url:"http://localhost:8081/Files?fileId="+uid,
-            data:bodyFormData,
-            headers: { 
-                "Content-Type": "multipart/form-data",
-                "Access-Control-Allow-Origin":"*"
-            }
-        }).then(response=>{
-            fsuccess(uid);
-        }).catch(error=>{
-            ferror(error);
+    const saveCard=function(photoId, transcriptionArrayList) {
+        let card=getCard(photoId);
+        fillExamples(card);
+        Rest.saveCard(card,function(response){
+            after();
         });
     };
 
-    const saveFile=function(f){
-        var imageFile=document.getElementById("pastedImage");
-        console.log("imageFile",imageFile);
-        const file = dataURLtoFile(imageFile.src,guid+'.png');
-        
-        console.log(file);
-        //console.log("image",imageFile);
-        var bodyFormData = new FormData();
-        bodyFormData.append('file', file);
-        //bodyFormData.append('name', file.name);
-        axios({
-            method:"POST",
-            url:"http://localhost:8081/Files?fileId="+guid,
-            data:bodyFormData,
-            headers: { 
-                "Content-Type": "multipart/form-data",
-                "Access-Control-Allow-Origin":"*"
-            }
-        }).then(response=>{
-            console.log("response",response);
-            f();
-        }).catch(error=>{
-            console.log(error);
-        });
-    }
-
-    const saveTranscriptionFiles=(f,ferr,index)=>{
-        let transcriptionArrayList=[...transcriptionArray];
-        
-        saveFileToServer(transcriptionArrayList[index].file,"mp3",(uid)=>{
-            transcriptionArrayList[index].fileId=uid;
-            setTranscriptionArray([...transcriptionArray]);
-            if(index+1<transcriptionArrayList.length) {
-                saveTranscriptionFiles(f,ferr,index+1);
+    const clickSaveContext=function() {
+        let loaded=[];
+        Rest.saveFileListToServer([...transcriptionArray],"mp3",loaded,()=>{
+            if(photoFile&&photoFile!=""){
+                Rest.saveFileV2(new File([Utils.base64ToArrayBuffer(photoFile)], "photo"),function(photoId){
+                    saveCard(loaded, photoId);
+                });
             } else {
-                f();
+                saveCard(loaded.at, null);
             }
         },(err)=>{
             console.log(err);
-            ferr(err);
+            alert("error. transciption files aren't saved. try again");
         });
-
-    };
-
-
-    const clickSaveContext=function(){
-
-        const save_card=function(photoId){
-            saveTranscriptionFiles(()=>{
-                let transcriptionArrayList=[...transcriptionArray];
-                let transcriptionDtoList=[];
-                for(let tr of transcriptionArrayList){
-                    if(tr.isURL && tr.link && tr.link!=""){
-                        
-                    }
-                    transcriptionDtoList.push(
-                        {
-                            value:tr.text.current.value,
-                            variant:tr.transcription,
-                            fileId:tr.fileId
-                        }
-                    );
-                }
-    
-                let card={
-                    photoId:photoId,
-                    partOfSpeechId:partOfSpeechId,
-                    expression:expressionValue.current.value,
-                    definition:definitionValue.current.value,
-                    translate:translateValue.current.value,
-                    transcriptionList:transcriptionDtoList,
-                    exampleList:[],
-                    slotIds:cardListIds
-                };
-    
-                let exampleList=[...examples];
-                for(let e of exampleList){
-                    card.exampleList.push(e.text.current.value);
-                }
-                console.log("card",card);
-                Rest.saveCard(card,function(response){
-                    console.log("response",response);
-                    window.confirm("Сохранено! Покинуть страницу ?");
-                    let isLeave=window.confirm("Сохранено! Покинуть страницу ?");
-                    if(isLeave){
-                        window.history.back();
-                    } else {
-                        window.location.reload();
-                    }
-                });
-            },(err)=>{
-                console.log(err);
-                alert("error. transciption files aren't saved. try again");
-            },0);
-        };
-
-        if(photoFile&&photoFile!=""){
-            let bytes=Rest.base64ToArrayBuffer(photoFile);
-            //console.log("photoFileFormat",photoFileFormat);
-            //photoFileFormat && photoFileFormat!=""?photoFileFormat:null
-            Rest.saveFileV2(new File([bytes], "photo"),function(photoId){
-                save_card(photoId);
-            });
-        } else {
-            save_card(null);
-        }
-
-        
-
-        
-
     }
 
     const partOfSpeechOnChange=function(e){
         console.log(e.target.value)
         setPartOfSpeechId(e.target.value);
-    }
-
-    const cut=(str,size)=>{
-        if(str.length<size) return str;
-        return str.substring(0,size)+"...";
     }
 
     let query=function(expr){
@@ -515,13 +269,7 @@ export default function CardWriter(props) {
     }
 
 
-    const getFile=function(e){
-        console.log("file arr = ",e.isFile, e.file);
-        if(e.isFile && e.file){
-            return Buffer.from(e.file).toString('base64');
-        }
-        return "";
-    }
+    
 
     return (
         <Stack justifyItems="center" alignItems="center">
@@ -592,9 +340,9 @@ export default function CardWriter(props) {
                                             <Typography>
                                                 <Grid container >
                                                     <Grid >
-                                                            <b><span title={e.text}>{cut(e.text,10)} </span> <span title={e.lexicalCategoryText}>({cut(e.lexicalCategoryText.toLowerCase(),6)}) </span></b> : <span title={e.definition}> {cut(e.definition,50)} </span>
+                                                            <b><span title={e.text}>{Utils.cut(e.text,10)} </span> <span title={e.lexicalCategoryText}>({Utils.cut(e.lexicalCategoryText.toLowerCase(),6)}) </span></b> : <span title={e.definition}> {Utils.cut(e.definition,50)} </span>
                                                             <br />
-                                                            {e.examples && e.examples.length>0 && <i><span title={e.examples[0]}> {cut(e.examples[0],70)} </span></i>}
+                                                            {e.examples && e.examples.length>0 && <i><span title={e.examples[0]}> {Utils.cut(e.examples[0],70)} </span></i>}
                                                     </Grid>
                                                     <Grid >
                                                     <IconButton  sx={{m:0,p:0}}>
@@ -686,81 +434,33 @@ export default function CardWriter(props) {
                 </Stack>
                 
                 <hr noshade/>
-                <Stack spacing={1}> 
-                    {
-                        transcriptionArray.map((e,index)=>(
-                            <Stack direction="row" spacing={1} key={e.key}>
-                                <FormControl size="small" sx={{width:120}}>
-                                    <InputLabel id={"demo-simple-select-label"+index}>ts</InputLabel>
-                                    <Select
-                                        labelId={"demo-simple-select-label"+index}
-                                        id={"demo-simple-select"+index}
-                                        value={e.transcription}
-                                        label="ts"
-                                        onChange={function(ev) {handleChangeTranscriptionSound(ev,index)}}
-                                    >
-                                        <MenuItem value={"UK"}>UK</MenuItem>
-                                        <MenuItem value={"US"}>US</MenuItem>
-                                    </Select>
-                                </FormControl>
-                                <TextField size="small" fullWidth inputRef={e.text} value={e.spelling}  label="Транскрипция" id={"standard-basic3"+index} variant="outlined"
-                                    onChange={(newValue) => {
-                                        e.spelling=newValue.target.value;
-                                    }}
-                                />
-                                {
-                                    (e.isFile==true || e.isURL==true) &&
-                                    <Button 
-                                        component="label" 
-                                        size="small" 
-                                        variant="contained"
-                                        onClick={function(){
-                                            console.log(e);
-                                            document.getElementById('audio_'+e.key).play();
-                                        }}
-                                    >
-                                        <VolumeUpIcon></VolumeUpIcon>
-                                        <audio id={"audio_"+e.key} controls preload="none" hidden>
-                                            <source src={
-                                                e.isFile==true?
-                                                ("data:audio/mp3;base64,"+getFile(e))
-                                                :(e.isURL==true && e.resultAudio?(
-                                                    (e.resultAudio)
-                                                ):"")
-                                            } type="audio/mpeg" />
-                                        </audio>
-                                    </Button>
-                                }
-                                <Button component="label" size="small" variant="contained" >
-                                    <AttachFileOutlinedIcon></AttachFileOutlinedIcon>
-                                    <input type="file" onChange={function(event) {
-                                        addArrayBufferFile(event.target.files[0],e);
-                                    }} hidden />
-                                </Button>
-                                {
-                                    transcriptionArray.length>1 && index<transcriptionArray.length-1 && <Button size="small" onClick={function(){clickRemoveTranscription(e)}} variant="contained">-</Button>
-                                }
-                                {
-                                    !(index<transcriptionArray.length-1) && <Button size="small" onClick={clickAddTranscription} variant="contained">+</Button>
-                                }
-                            </Stack>
-                        ))
-                    }
-                    
+                <Stack spacing={1}>
+                    //Transciption
                 </Stack>
-                <TextField size="small" inputRef={translateValue} fullWidth  label="Перевод" id="standard-basic222" variant="outlined" />
+                <TextField size="small" inputRef={translateValue} value={translateText} fullWidth  label="Перевод" id="standard-basic222" variant="outlined" 
+                    onChange={(newValue) => {
+                        setTranslateText(newValue.target.value);
+                    }}
+                />
                 <Autocomplete
                     multiple
                     id="tags-outlined"
                     options={cardList}
+                    value={defSlots}
                     onChange={(event, newValue) => {
                         let arr=[];
+                        let arr2=[];
                         if(newValue) {
                             for(let i=0;i<newValue.length;i++) {
                                 arr.push(newValue[i].id);
+                                arr2.push({
+                                    id:newValue[i].id,
+                                    title:newValue[i].title
+                                });
                             }
                         }
                         setCardListIds(arr);
+                        setDefSlots(arr2);
                         console.log("event",event);
                         console.log("newValue",newValue);
                     }}

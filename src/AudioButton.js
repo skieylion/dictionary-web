@@ -6,6 +6,7 @@ import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import Tooltip from '@mui/material/Tooltip';
 import Rest from './Rest';
 import { useParams } from 'react-router-dom';
+import Utils from './Utils';
 
 
 export default function AudioButton(props) {
@@ -13,10 +14,14 @@ export default function AudioButton(props) {
   let {source,type}=useParams();
   source=props.source;
   type=props.type;
-  const audioId='audio_'+Rest.uuidv4();
+  const audioId='audio_'+Utils.uuidv4();
   const click=function(){
     document.getElementById(audioId).play();
+    
+    console.log("props",props)
   };
+
+  
 
   return (
     <span>
@@ -24,8 +29,8 @@ export default function AudioButton(props) {
         type=="Button" &&
         <Button 
           component="label" 
-          size="small" 
           variant="contained"
+          sx={{height:'100%'}}
           onClick={click}
         >
           <VolumeUpIcon></VolumeUpIcon>
