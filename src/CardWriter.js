@@ -117,7 +117,7 @@ export default function CardWriter(props) {
         setDefValue(card.definition);
         setPartOfSpeechId(card.partOfSpeech.id);
         setExamplesFromCard(card);
-        setTranscriptionsFromCard(card);
+        //setTranscriptionsFromCard(card);
         setTranslateText(card.translate);
         setSlots(card);
 
@@ -125,13 +125,6 @@ export default function CardWriter(props) {
         //setCurrentWord(e); ?
     }
 
-    
-    
-    
-
-    
-
-    
     const [examples,setExamples]=React.useState([
         {
             key:1,
@@ -198,7 +191,7 @@ export default function CardWriter(props) {
             expression:expressionValue.current.value,
             definition:definitionValue.current.value,
             translate:translateValue.current.value,
-            transcriptionList:Utils.getTranscriptionDtoList(transcriptionArrayList),
+            //transcriptionList:Utils.getTranscriptionDtoList(transcriptionArrayList),
             exampleList:[],
             slotIds:cardListIds
         };
@@ -231,18 +224,18 @@ export default function CardWriter(props) {
 
     const clickSaveContext=function() {
         let loaded=[];
-        Rest.saveFileListToServer([...transcriptionArray],"mp3",loaded,()=>{
-            if(photoFile&&photoFile!=""){
-                Rest.saveFileV2(new File([Utils.base64ToArrayBuffer(photoFile)], "photo"),function(photoId){
-                    saveCard(loaded, photoId);
-                });
-            } else {
-                saveCard(loaded.at, null);
-            }
-        },(err)=>{
-            console.log(err);
-            alert("error. transciption files aren't saved. try again");
-        });
+        // Rest.saveFileListToServer([...transcriptionArray],"mp3",loaded,()=>{
+        //     if(photoFile&&photoFile!=""){
+        //         Rest.saveFileV2(new File([Utils.base64ToArrayBuffer(photoFile)], "photo"),function(photoId){
+        //             saveCard(loaded, photoId);
+        //         });
+        //     } else {
+        //         saveCard(loaded.at, null);
+        //     }
+        // },(err)=>{
+        //     console.log(err);
+        //     alert("error. transciption files aren't saved. try again");
+        // });
     }
 
     const partOfSpeechOnChange=function(e){
@@ -354,7 +347,15 @@ export default function CardWriter(props) {
                                                             setDefValue(e.definition);
                                                             setPartOfSpeechId(Rest.getCatIdByValue(e.lexicalCategoryId));
                                                             setExampleList(e.examples);
-                                                            setTranscription(e.transcriptionList);
+
+                                                            Rest.getAudio(e.transcriptionList[0].audioFile,function(result){
+                                                                console.log("-----------------------")
+                                                                console.log(result);
+                                                            });
+
+                                                        
+                                                            console.log("e.transcriptionList",e.transcriptionList)
+                                                            //setTranscription(e.transcriptionList);
                                                         }} />
                                                     </IconButton>
                                                     </Grid>
@@ -435,7 +436,7 @@ export default function CardWriter(props) {
                 
                 <hr noshade/>
                 <Stack spacing={1}>
-                    //Transciption
+                    <Transciption  />
                 </Stack>
                 <TextField size="small" inputRef={translateValue} value={translateText} fullWidth  label="Перевод" id="standard-basic222" variant="outlined" 
                     onChange={(newValue) => {

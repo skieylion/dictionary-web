@@ -92,8 +92,8 @@ const Utils =  {
             console.log(reader.error);
         };
     },
-    getSource:function(file){
-        return "data:audio/mp3;base64,"+Buffer.from(file).toString('base64');
+    getSource:function(data8,type){
+        return "data:"+type+";base64,"+Buffer.from(data8).toString('base64');
     }
 }
 

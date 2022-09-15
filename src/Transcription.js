@@ -21,7 +21,7 @@ import Rest from './Rest';
 import Service from './Service';
 import AudioButton from './AudioButton';
 import Utils from './Utils';
-import AttachFileOutlinedIcon from '@mui/icons-material/AttachFileOutlined';
+
 import FileAttach from './FileAttach';
 
 const axios=require('axios').default;
@@ -30,23 +30,24 @@ export default function Transciption(props) {
 
     const buffer=React.useRef('');
 
-    props.init((transciptions)=>{
-        let arr=[];
-        for(let i=0;i<transciptions.length;i++) {
-            let tr=transciptions[i];
-            let value=Utils.getAddArray([],buffer);
-            value.key=Utils.getKeyIndex();
-            value.text='';
-            value.transcription='UK';
-            value.spelling=tr.spelling;
-            value.file=tr.file;
-            value.isFile=tr.isFile;
-            value.isURL=tr.isURL;
-            value.fileId=tr.fileId;
-            arr.push(value);
-        };
-        setTranscriptionArray(arr);
-    });
+    // props.init((transciptions)=>{
+    //     let arr=[];
+    //     for(let i=0;i<transciptions.length;i++) {
+    //         let tr=transciptions[i];
+    //         let value=Utils.getAddArray([],buffer);
+    //         value.key=Utils.getKeyIndex();
+    //         value.text='';
+    //         value.transcription='UK';
+    //         value.spelling=tr.spelling;
+    //         value.file=tr.file;
+    //         value.isFile=tr.isFile;
+    //         value.isURL=tr.isURL;
+    //         value.fileId=tr.fileId;
+    //         arr.push(value);
+    //     };
+    //     setTranscriptionArray(arr);
+    // });
+
     const [transcriptionArray,setTranscriptionArray]=React.useState([{
         key:Utils.getKeyIndex(),
         text:React.useRef(''),
@@ -86,6 +87,9 @@ export default function Transciption(props) {
         }
         return true;
     };
+    const refresh=function(){
+        setTranscriptionArray([...transcriptionArray]);
+    };
 
     return (
         <span>
@@ -94,35 +98,27 @@ export default function Transciption(props) {
                     <Stack direction="row" spacing={1} key={e.key}>
                         <FormControl size="small" sx={{width:120}}>
                             <InputLabel id={"demo-simple-select-label"+index}>ts</InputLabel>
-                            <Select
-                                labelId={"demo-simple-select-label"+index}
-                                id={"demo-simple-select"+index}
-                                value={e.transcription}
-                                label="ts"
+                            <Select labelId={"demo-simple-select-label"+index} id={"demo-simple-select"+index} value={e.transcription} label="ts"
                                 onChange={function(ev) {handleChangeTranscriptionSound(ev,index)}}
                             >
                                 <MenuItem value={"UK"}>UK</MenuItem>
                                 <MenuItem value={"US"}>US</MenuItem>
                             </Select>
                         </FormControl>
-                        <TextField 
-                            size="small" 
-                            fullWidth 
-                            inputRef={e.text} 
-                            value={e.spelling}  
-                            label="Транскрипция" 
-                            id={"standard-basic3"+index} 
-                            variant="outlined"
-                            onChange={(newValue) => {e.spelling=newValue.target.value;}}
+                        <TextField size="small" fullWidth inputRef={e.text} value={e.spelling}  label="Транскрипция" id={"standard-basic3"+index} variant="outlined"
+                            onChange={(newValue) => {
+                                e.spelling=newValue.target.value;
+                                refresh();
+                            }}
                         />
                         {
                             (e.isFile==true || e.isURL==true) &&
-                            <AudioButton source={e.isFile==true?Utils.getSource(e.file):Rest.file(e.fileId)} type={"Button"} />
+                            <AudioButton source={e.isFile==true?Utils.getSource(e.file.data8,e.file.metaFile.type):Rest.file(e.fileId)} type={"Button"} />
                         }
                         <FileAttach onChange={ function(file) {
                             e.isFile=true;
                             e.file=file;
-                            setTranscriptionArray([...transcriptionArray]);
+                            refresh();
                         }} />
                         {
                             transcriptionArray.length>1 && index<transcriptionArray.length-1 && 
