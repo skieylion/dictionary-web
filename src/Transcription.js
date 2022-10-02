@@ -30,6 +30,22 @@ export default function Transciption(props) {
 
     const buffer=React.useRef('');
 
+    props.fill(function(transciptions) {
+        if(transciptions && transciptions.length>0) {
+            transcriptionArray.pop();
+            let tr=transciptions[0];
+            transcriptionArray.push({
+                key:Utils.getKeyIndex(),
+                transcription:'UK',
+                isURL:true,
+                isExternal:true,
+                url:tr.audioFile,
+                spelling:tr.phoneticSpelling
+            });
+            setTranscriptionArray(transcriptionArray);
+        }
+    });
+
     // props.init((transciptions)=>{
     //     let arr=[];
     //     for(let i=0;i<transciptions.length;i++) {
@@ -95,7 +111,7 @@ export default function Transciption(props) {
         <span>
             {
                 transcriptionArray.map((e,index)=>(
-                    <Stack direction="row" spacing={1} key={e.key}>
+                    <Stack direction="row" sx={{m:1}} spacing={1} key={e.key}>
                         <FormControl size="small" sx={{width:120}}>
                             <InputLabel id={"demo-simple-select-label"+index}>ts</InputLabel>
                             <Select labelId={"demo-simple-select-label"+index} id={"demo-simple-select"+index} value={e.transcription} label="ts"
@@ -113,13 +129,9 @@ export default function Transciption(props) {
                         />
                         {
                             (e.isFile==true || e.isURL==true) &&
-                            <AudioButton source={e.isFile==true?Utils.getSource(e.file.data8,e.file.metaFile.type):Rest.file(e.fileId)} type={"Button"} />
+                            <AudioButton source={e.isFile==true?Utils.getSource(e.file.data8,e.file.metaFile.type):(e.isExternal==true?e.url:Rest.file(e.fileId))} type={"Button"} />
                         }
-                        <FileAttach onChange={ function(file) {
-                            e.isFile=true;
-                            e.file=file;
-                            refresh();
-                        }} />
+                        <FileAttach onChange={ function(file) { e.isFile=true; e.file=file; refresh(); }} />
                         {
                             transcriptionArray.length>1 && index<transcriptionArray.length-1 && 
                             <Button size="small" onClick={function(){clickRemoveTranscription(e)}} variant="contained">-</Button>

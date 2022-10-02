@@ -24,6 +24,15 @@ import CircularProgress from '@mui/material/CircularProgress';
 import AudioButton from './AudioButton';
 import Utils from './Utils';
 import Transciption from './Transcription';
+import SearchExpression from './SearchExpression';
+import ExpressionList from './ExpressionList';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import Examples from './Examples';
+import SlotSelect from './SlotSelect';
+
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const axios=require('axios').default;
 
@@ -31,18 +40,29 @@ const axios=require('axios').default;
 
 export default function CardWriter(props) {
 
+    const [entryExpanded,setEntryExpanded]=React.useState(false);
+    const [imageExpanded,setImageExpanded]=React.useState(false);
+    const [defExpanded,setDefExpanded]=React.useState(false);
+    const [exampleExpanded,setExampleExpanded]=React.useState(false);
+    const [transactionExpanded,setTransactionExpanded]=React.useState(false);
+
+    const collapseAll=function(state) {
+        setEntryExpanded(state);
+        setImageExpanded(state);
+        setDefExpanded(state);
+        setExampleExpanded(state);
+        setTransactionExpanded(state);
+    };
+
     const [partOfSpeechList, setPartOfSpeechList] = useState([]);
     const [guid, setGuid] = useState([]);
-    const [cardList, setCardList] = useState([]);
-    const [cardListIds, setCardListIds] = useState([]);
-    const [wordList, setWordList] = useState([]);
+    
     const [currentWord, setCurrentWord] = useState({});
     const [defValue,setDefValue]=useState('');
     const [isSearch,setIsSearch]=React.useState(false);
     const [isPicture,setIsPicture]=React.useState(false);
     const [translateText,setTranslateText]=useState('');
-    const [defSlots,setDefSlots]=useState([]);
-
+    
     const mode=Utils.getParams("mode");
     const cardId=Utils.getParams("cardId");
 
@@ -60,16 +80,6 @@ export default function CardWriter(props) {
                 });
             }
             setPartOfSpeechList(data);
-        });
-        Rest.getCardList(function(response){
-            let data=[];
-            for(const d of response.data){
-                data.push({
-                    id:d.id,
-                    title:d.name
-                });
-            }
-            setCardList(data);
         });
 
         console.log("mode = ",Utils.getParams("mode"));console.log("cardId = ",cardId);
@@ -92,46 +102,7 @@ export default function CardWriter(props) {
         setExampleList(examples);
     }
 
-    const setSlots=function(card){
-        let slots=[];
-        let slotList=[];
-        for(let i=0;i<card.slots.length;i++) {
-            slots.push(card.slots[i].id);
-            slotList.push({
-                title: card.slots[i].name,
-                id: card.slots[i].id
-            });
-        }
-        setCardListIds(slots);
-        setDefSlots(slotList);
-
-        console.log("slotList",slotList);
-    }
-
-
-    const fillCard=function(card) {
-
-        console.log("card = ", card);
-        setWordList([]);
-        setExprValue(card.expression);
-        setDefValue(card.definition);
-        setPartOfSpeechId(card.partOfSpeech.id);
-        setExamplesFromCard(card);
-        //setTranscriptionsFromCard(card);
-        setTranslateText(card.translate);
-        setSlots(card);
-
-        //setCardImage ...
-        //setCurrentWord(e); ?
-    }
-
-    const [examples,setExamples]=React.useState([
-        {
-            key:1,
-            text:React.useRef(''),
-            value:""
-        }
-    ]);
+    
     
 
     
@@ -144,9 +115,11 @@ export default function CardWriter(props) {
     const [exprValue,setExprValue]=React.useState('');
     
     
-    const [photoFile,setPhotoFile]=React.useState('');
-    const [photoFileFormat,setPhotoFileFormat]=React.useState('');
-
+    const [imageFile,setImageFile]=React.useState({file:{}});
+    const updateImageFile=function(file) {
+        imageFile.file=file;
+        setImageFile(imageFile);
+    }
     
 
     const setExampleList=function(listText) {
@@ -162,27 +135,8 @@ export default function CardWriter(props) {
             });
         }
         
-        setExamples(newArr);
+        fillExamples(newArr);
     }
-
-    
-
-    
-
-    //примеры
-    const clickRemoveExample=function(e){
-        console.log(e);
-        if(examples.length>1) {
-            setExamples(Utils.getRemoveArray(examples,e.key));
-        } else {
-            //alert("Контекст должен содержать не менее 1 примера")
-        }
-    }
-
-    const clickAddExample=function(){
-        setExamples(Utils.getAddArray(examples,buffer));
-    }
-    //транскрипция
     
     const getCard=function(photoId) {
         return {
@@ -193,15 +147,8 @@ export default function CardWriter(props) {
             translate:translateValue.current.value,
             //transcriptionList:Utils.getTranscriptionDtoList(transcriptionArrayList),
             exampleList:[],
-            slotIds:cardListIds
+            //slotIds:cardListIds
         };
-    };
-
-    const fillExamples=function(card) {
-        let exampleList=[...examples];
-        for(let e of exampleList){
-            card.exampleList.push(e.text.current.value);
-        }
     };
 
     const after=function(){
@@ -238,248 +185,171 @@ export default function CardWriter(props) {
         // });
     }
 
+    
+
+    
+
+    let expr_list_init;
+    let fillExamples;
+    let fillTransactions;
+
     const partOfSpeechOnChange=function(e){
-        console.log(e.target.value)
         setPartOfSpeechId(e.target.value);
     }
-
     let query=function(expr){
         return expressionValue;
     }
-
-    const getPhoto=function(){
-        var request = new XMLHttpRequest();
-        request.open('GET', "https://unsplash.com/photos/rJ236eQHXGA/download?ixid=MnwzNTEyNjB8MHwxfHNlYXJjaHwxfHxjdXR8ZW58MHx8fHwxNjU5NTU4NjM0", true);
-        request.responseType = 'blob';
-        request.onload = function() {
-            var reader = new FileReader();
-            reader.readAsDataURL(request.response);
-            reader.onload =  function(e){
-                console.log('DataURL:', e.target.result);
-            };
-        };
-        request.send();
+    const expr_list_buffer=function(f){
+        expr_list_init=f;
+    }
+    const selected=function(word) {
+        if(word.isApi==true) expr_list_init(word.value);
+        query(word.name);
+        collapseAll(true);
+        setTimeout(function(){
+            setImageExpanded(false);
+        },100);
+        setTimeout(function(){
+            setImageExpanded(true);
+        },400);
+        
+    }
+    const changeActiveStep=function(file){
+        if(file && file.type !="file") {
+            Rest.getPhoto(file.source,function(image,format) {
+                updateImageFile(file);
+            });
+        } else {
+            updateImageFile(file);
+        }
     }
 
 
-    
+    const expr_list_selected=function(e){
+        console.log(e);
+        setDefValue(e.definition);
+        setPartOfSpeechId(Rest.getCatIdByValue(e.lexicalCategoryId));
+        fillExamples(e.examples);
+        fillTransactions(e.transcriptionList);
+        setTimeout(function(){
+            setTransactionExpanded(false);
+        },100);
+        setTimeout(function(){
+            setTransactionExpanded(true);
+        },400);
+    };
+
+    const fillCard=function(card) {
+
+        console.log("card = ", card);
+        //setWordList([]);
+        setExprValue(card.expression);
+        
+        
+        setExamplesFromCard(card);
+        //setTranscriptionsFromCard(card);
+        setTranslateText(card.translate);
+        //setSlots(card);
+
+        //setCardImage ...
+        //setCurrentWord(e); ?
+    }
+
+    // setExprValue(e.text);
+                                // setCurrentWord(e);
+                                // setWordList([]);
+                                // setDefValue(e.definition);
+                                // setPartOfSpeechId(Rest.getCatIdByValue(e.lexicalCategoryId));
+                                // setExampleList(e.examples);
+
+                                // Rest.getAudio(e.transcriptionList[0].audioFile,function(result){
+                                //     console.log("-----------------------")
+                                //     console.log(result);
+                                // });
+
+                            
+                                // console.log("e.transcriptionList",e.transcriptionList)
+                                //setTranscription(e.transcriptionList);
 
     return (
         <Stack justifyItems="center" alignItems="center">
             <Stack spacing={1} sx={{width:650}}>
-                <Stack spacing={1} direction="row" fullWidth>
-                    <TextField size="small" fullWidth  label="Выражение" id="standard-basic31" inputRef={expressionValue} value={exprValue} variant="outlined" 
-                        onKeyDown={function(e){
-                            if(e.code=="Enter") {
-                                if(exprValue && exprValue.length>2) {
-                                    console.log(exprValue);
-                                    setIsPicture(true);
-                                    setIsSearch(true);
-                                    query(exprValue);
-                                    Rest.find(exprValue)
-                                    .then(res=>{
-                                        setIsSearch(false);
-                                        setWordList(res);
-                                    });
-                                }
-                                console.log(exprValue);
-                            }
-                        }}
-                         onChange={
-                            function(e) {
-                                setExprValue(e.target.value);
-                            }
-                        }
-                    />
-                    {
-                        isSearch &&
-                        <Box sx={{ display: 'flex' }}>
-                            <CircularProgress />
-                        </Box>
-                    }
-                    <FormControl sx={{ width: 200 }}>
-                        <InputLabel id="demo-simple-select-label">Часть речи</InputLabel>
-                        <Select
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            value={partOfSpeechId}
-                            //defaultValue={1}
-                            label="Часть речи"
-                            size="small"
-                            onChange={partOfSpeechOnChange}
-                        >
-                            {partOfSpeechList.map((ps)=>(
-                                <MenuItem key={ps.value} value={ps.value}>{ps.name}</MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                </Stack>
-                <Stack>
-                {
-                    wordList && wordList.length>0 &&
-                    <Box
-                        overflow="auto"
-                        sx={{
-                            display: 'flex',
-                            border: '1px dashed grey',
-                            maxHeight:'300px'
-                        }}
-                    >
-                        <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-                            {
-                                wordList.map((e,index)=>(
-                                    <div>
-                                        <ListItem>
-                                            <Typography>
-                                                <Grid container >
-                                                    <Grid >
-                                                            <b><span title={e.text}>{Utils.cut(e.text,10)} </span> <span title={e.lexicalCategoryText}>({Utils.cut(e.lexicalCategoryText.toLowerCase(),6)}) </span></b> : <span title={e.definition}> {Utils.cut(e.definition,50)} </span>
-                                                            <br />
-                                                            {e.examples && e.examples.length>0 && <i><span title={e.examples[0]}> {Utils.cut(e.examples[0],70)} </span></i>}
-                                                    </Grid>
-                                                    <Grid >
-                                                    <IconButton  sx={{m:0,p:0}}>
-                                                        <AddCircleIcon  sx={{m:0,p:0}} onClick={function(){
-                                                            console.log(e);
-                                                            setExprValue(e.text);
-                                                            setCurrentWord(e);
-                                                            setWordList([]);
-                                                            setDefValue(e.definition);
-                                                            setPartOfSpeechId(Rest.getCatIdByValue(e.lexicalCategoryId));
-                                                            setExampleList(e.examples);
-
-                                                            Rest.getAudio(e.transcriptionList[0].audioFile,function(result){
-                                                                console.log("-----------------------")
-                                                                console.log(result);
-                                                            });
-
-                                                        
-                                                            console.log("e.transcriptionList",e.transcriptionList)
-                                                            //setTranscription(e.transcriptionList);
-                                                        }} />
-                                                    </IconButton>
-                                                    </Grid>
-                                                </Grid>
-                                            </Typography>
-                                        </ListItem>
-                                        <Divider  sx={{ width: '100%' }}  />
-                                    </div>
-                                ))
-                            }
-                        </List>
-                    </Box>
-                }
-                </Stack>
-                <Stack spacing={0} sx={{ display: isPicture?'block':'none' }}>
-                    <Stack justifyItems="center" alignItems="center">
-                        <Stack spacing={1} sx={{width:650}}>
+                <SearchExpression selected={selected}  />
+                <span>
+                    <Accordion expanded={entryExpanded} >
+                        <AccordionSummary expandIcon={<ExpandMoreIcon onClick={() => setEntryExpanded(!entryExpanded)} />} aria-controls="panel1d-content" id="panel1a-header">
+                            <Typography>entries</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <ExpressionList init={expr_list_buffer} selected={expr_list_selected} />
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion expanded={imageExpanded} >
+                        <AccordionSummary expandIcon={<ExpandMoreIcon onClick={() => setImageExpanded(!imageExpanded)} />} aria-controls="panel1d-content" id="panel2a-header">
+                            <Typography>an image</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
                             <CardImage role="writer" 
-                                query={function(f){
-                                    query=f;
-                                }}
-
-                                changeActiveStep={function(img){
-                                    if(img && img !=""){
-                                        Rest.getPhoto(img,function(res,format){
-                                            setPhotoFile(res);
-                                            setPhotoFileFormat(format);
-                                        });
-                                    }
-                                    console.log(img);
-                                }}
-
-                                pasteImage={function(res,format){
-                                    let str=res.replace(res.substring(0,res.indexOf("base64,")+7),"");
-                                    setPhotoFile(str);
-                                    setPhotoFileFormat(format);
+                                query={function(f){query=f;}}
+                                changeActiveStep={changeActiveStep}
+                                pasteImage={function(file) {
+                                    console.log("pasted")
+                                    //setPhotoFile(Utils.getData64FromSource(file.source));
+                                    //setPhotoFileFormat(file.format);
                                 }}
                             />
-                        </Stack>
-                    </Stack>
-                </Stack>
-                <TextField size="small" fullWidth  label="Определение" id="standard-basic222" variant="outlined"
-                    inputRef={definitionValue} 
-                    value={defValue} 
-                    onChange={(newValue) => {
-                        setDefValue(newValue.target.value);
-                    }}
-                />
-                <Stack spacing={1}>
-                    {
-                        examples.map((e,index)=>(
-                            <Stack spacing={1} direction="row">
-                                <TextField 
-                                    size="small" 
-                                    fullWidth 
-                                    key={e.key}
-                                    value={e.value}  
-                                    defaultValue={e.text.current.value} 
-                                    inputRef={e.text}  
-                                    label={"Пример"} 
-                                    variant="outlined" 
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion  expanded={defExpanded}  >
+                        <AccordionSummary expandIcon={<ExpandMoreIcon onClick={() => setDefExpanded(!defExpanded)} />} aria-controls="panel1d-content" id="panel3a-header">
+                            <Typography>a definition</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <Stack spacing={1}>
+                                <TextField size="small" fullWidth  label="definition" id="standard-basic222" variant="outlined" multiline inputRef={definitionValue}  value={defValue} 
                                     onChange={(newValue) => {
-                                        e.value=newValue.target.value;
+                                        setDefValue(newValue.target.value);
                                     }}
                                 />
-                                {
-                                    examples.length>1 && index<examples.length-1 && <Button size="small" onClick={function(){clickRemoveExample(e)}} variant="contained">-</Button>
-                                }
-                                {
-                                    !(index<examples.length-1) && <Button size="small"  variant="contained" onClick={clickAddExample}>+</Button>
-                                }
-                            </Stack>   
-                        ))
-                    }
-                 
-                    
-                </Stack>
-                
-                <hr noshade/>
-                <Stack spacing={1}>
-                    <Transciption  />
-                </Stack>
-                <TextField size="small" inputRef={translateValue} value={translateText} fullWidth  label="Перевод" id="standard-basic222" variant="outlined" 
-                    onChange={(newValue) => {
-                        setTranslateText(newValue.target.value);
-                    }}
-                />
-                <Autocomplete
-                    multiple
-                    id="tags-outlined"
-                    options={cardList}
-                    value={defSlots}
-                    onChange={(event, newValue) => {
-                        let arr=[];
-                        let arr2=[];
-                        if(newValue) {
-                            for(let i=0;i<newValue.length;i++) {
-                                arr.push(newValue[i].id);
-                                arr2.push({
-                                    id:newValue[i].id,
-                                    title:newValue[i].title
-                                });
-                            }
-                        }
-                        setCardListIds(arr);
-                        setDefSlots(arr2);
-                        console.log("event",event);
-                        console.log("newValue",newValue);
-                    }}
-                    getOptionLabel={(option) => option.title}
-                    filterSelectedOptions
-                    //defaultValue={[top100Films[13]]}
-                    renderInput={(params) => (
-                        <TextField
-                            {...params}
-                            //variant="standard"
-                            label="sets"
-                            placeholder="..."
-                        />
-                    )}
-                />
+                                <Stack spacing={1} direction="row" fullWidth>
+                                    <FormControl sx={{ width: 200 }}>
+                                        <InputLabel id="demo-simple-select-label">speach part</InputLabel>
+                                        <Select labelId="demo-simple-select-label" id="demo-simple-select" value={partOfSpeechId} label="a speech part" size="small" onChange={partOfSpeechOnChange}>
+                                            {partOfSpeechList.map((ps)=>(
+                                                <MenuItem key={ps.value} value={ps.value}>{ps.name}</MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                    <TextField size="small" inputRef={translateValue} value={translateText} fullWidth  label="translate" id="standard-basic222" variant="outlined" 
+                                        onChange={(newValue) => {
+                                            setTranslateText(newValue.target.value);
+                                        }}
+                                    />
+                                </Stack>
+                            </Stack>
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion expanded={exampleExpanded}  >
+                        <AccordionSummary expandIcon={<ExpandMoreIcon onClick={() => setExampleExpanded(!exampleExpanded)} />} aria-controls="panel1d-content" id="panel4a-header">
+                            <Typography>examples</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <Examples fill={function(f){fillExamples=f;}} />
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion expanded={transactionExpanded}  >
+                        <AccordionSummary expandIcon={<ExpandMoreIcon onClick={() => setTransactionExpanded(!transactionExpanded)} />} aria-controls="panel1d-content" id="panel5a-header">
+                            <Typography>transciptions</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <Transciption fill={function(f){fillTransactions=f;}} />
+                        </AccordionDetails>
+                    </Accordion>
+                </span>
+                <SlotSelect />
                 <Stack spacing={1} direction="row">
-                    <Button fullWidth size="small" onClick={clickSaveContext}  variant="contained">Сохранить</Button>
-                    <Button fullWidth size="small" component={Link} to={"/"} variant="contained">Отменить</Button>
+                    <Button fullWidth size="small" onClick={clickSaveContext}  variant="contained">save</Button>
+                    <Button fullWidth size="small" component={Link} to={"/"} variant="contained">cancel</Button>
                 </Stack>
             </Stack>
         </Stack>

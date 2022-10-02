@@ -70,7 +70,7 @@ let Rest =  {
             if(res.data && res.data.length>0){
                 for(let i=0;i<Math.min(res.data.length,10);i++){
                     arr.push({
-                        imgPath:res.data[i]
+                        source:res.data[i]
                     });
                 }
             }
@@ -120,12 +120,11 @@ let Rest =  {
         xmlHttp.open("GET", back("/loader/photo?url=",url), true); // true for asynchronous 
         xmlHttp.send(null);
     },
-    find:function(query){
+    entries:function(wordId){
         return axios({
             method:"GET",
-            url:back("/entries?query=",query)
-        })
-        .then(res => res.data)
+            url:back("/entries?wordId=",wordId)
+        }).then(res => res.data)
         .catch(err => console.error(err));
     },
     toLink:function(link){
@@ -317,6 +316,13 @@ let Rest =  {
     },
     file:function(fileId) {
         return back("/Files", fileId);
+    },
+    search:function(query) {
+        return axios({
+            method:"GET",
+            url:back("/search?query=",query)
+        }).then(res => res.data)
+        .catch(err => console.error(err));
     }
 }
 

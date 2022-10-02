@@ -94,6 +94,32 @@ const Utils =  {
     },
     getSource:function(data8,type){
         return "data:"+type+";base64,"+Buffer.from(data8).toString('base64');
+    },
+    paste:function(event, onload) {
+        var items = (event.clipboardData  || event.originalEvent.clipboardData).items;
+        var blob = null;
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf("image") === 0) {
+                blob = items[i].getAsFile();
+            }
+        }
+        if (blob !== null) {
+            var reader = new FileReader();
+            reader.onload = function(event) {
+                onload({
+                    source:event.target.result,
+                    type:"file",
+                    format: event.target.result.split('data:image/')[1].split(';base64')[0]
+                });
+            };
+            reader.readAsDataURL(blob);
+        }
+    },
+    getData64FromSource:function(source) {
+        return source.replace(source.substring(0,source.indexOf("base64,")+7),"");
+    },
+    getSourceFromFile64:function(data64,format) {
+        return "data:"+format+";base64,"+data64;
     }
 }
 
